@@ -1,0 +1,51 @@
+{
+  "name": "battleship",
+  "version": "1.0.0",
+  "description": "the classic battleship game ",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack serve --open",
+    "deploy": "git push origin :gh-pages && git subtree push --prefix dist origin gh-pages",
+    "test": "jest",
+    "watch": "jest --watch *.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anasmustafa123/Battleship.git"
+  },
+  "keywords": [
+    "battleship",
+    "testing",
+    "game"
+  ],
+  "author": "anas mustafa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anasmustafa123/Battleship/issues"
+  },
+  "homepage": "https://github.com/anasmustafa123/Battleship#readme",
+  "devDependencies": {
+    "@babel/core": "^7.21.8",
+    "@babel/preset-env": "^7.21.5",
+    "autoprefixer": "^10.4.14",
+    "babel-loader": "^9.1.2",
+    "css-loader": "^6.7.3",
+    "eslint": "^8.44.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-standard": "^5.0.0",
+    "gh-pages": "^5.0.0",
+    "html-webpack-plugin": "^5.5.1",
+    "postcss-loader": "^7.3.0",
+    "style-loader": "^3.3.2",
+    "webpack": "^5.82.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "webpack-bundle-analyzer": "^4.8.0",
+    "webpack-cli": "^5.0.2",
+    "webpack-dev-server": "^4.13.3",
+    "jest": "^29.6.2"
+  }
+}
