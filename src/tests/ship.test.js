@@ -3,15 +3,15 @@ import { point } from "../scripts/point";
 
 test("ship --> isSunk --> normal case", () => {
   let spoint = point(0, 0);
-  let alignment = "v";
+  let alignment = "h"; 
   let ship1 = ship(3, spoint, alignment);
   expect(ship1.isSunk()).toBe(false);
   let hitPoint1 = point(0, 0);
   let hitPoint3 = point(0, 1);
   let hitPoint4 = point(0, 2);
-  ship1.isHit(hitPoint1);
-  ship1.isHit(hitPoint3);
-  ship1.isHit(hitPoint4);
+  expect(ship1.isHit(hitPoint1)).toBe(true);
+  expect(ship1.isHit(hitPoint3)).toBe(true);
+  expect(ship1.isHit(hitPoint4)).toBe(true);
   expect(ship1.isSunk()).toBe(true);
 });
 
@@ -34,6 +34,15 @@ test("ship --> isHit ---> cascading points", () => {
   let ship1 = ship(5, spoint, alignment);
   expect(ship1.isHit(hitPoint1)).toEqual(true);
   expect(ship1.isHit(hitPoint1)).toEqual(null);
+});
+
+test("ship --> isHit ---> cascading points", () => {
+  let spoint = point(0, 5);
+  let alignment = "h";
+  let hitPoint1 = point(2, 6); 
+  let ship1 = ship(5, spoint, alignment);
+  expect(ship1.isHit(hitPoint1)).toEqual(false);
+  expect(ship1.isHit(hitPoint1)).toEqual(false);
 });
 
 test("ship --> hitCount --> normaltest", () => {
