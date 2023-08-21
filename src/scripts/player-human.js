@@ -26,5 +26,13 @@ const human = (name) => {
 
   /*here: addEventListners & check if turn is true */
 
-  return { lastResult, requestAnAttack, makeAnAttack, enemyAttack, isLost, setGame };
+  return {
+    lastResult,
+    requestAnAttack,
+    makeAnAttack,
+    enemyAttack,
+    isLost,
+    setGame,
+  };
 };
+export { human };
