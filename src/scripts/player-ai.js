@@ -39,6 +39,13 @@ const ai = () => {
     gameEnemy = enemy;
     currentGame = game;
   };
-  return { lastResult, requestAnAttack, enemyAttack, isLost, setGame };
+  const getLastAttackResult = () => lastResult;
+  return Object.assign(proto, {
+    getLastAttackResult,
+    requestAnAttack,
+    enemyAttack,
+    isLost,
+    setGame,
+  });
 };
 export { ai };

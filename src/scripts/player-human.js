@@ -1,3 +1,4 @@
+import { player } from "./player";
 const human = (name) => {
   let gameEnemy;
   let currentGame;
@@ -23,16 +24,15 @@ const human = (name) => {
     turn = false;
     /* here: game.nextMove() */
   };
-
+  const getLastAttackResult = () => lastResult;
   /*here: addEventListners & check if turn is true */
-
-  return {
-    lastResult,
+  return Object.assign(proto, {
+    getLastAttackResult,
     requestAnAttack,
     makeAnAttack,
     enemyAttack,
     isLost,
     setGame,
-  };
+  });
 };
 export { human };
