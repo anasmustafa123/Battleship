@@ -3,7 +3,6 @@ import { ai } from "../scripts/player-ai";
 import { game } from "../scripts/game";
 import { point } from "../scripts/point";
 import { ship } from "../scripts/ship";
-import { player } from "../scripts/player";
 
 test("game ---> pl1 hitting the water", () => {
   let player1 = human('anas'); 
