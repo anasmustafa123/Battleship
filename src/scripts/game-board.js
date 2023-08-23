@@ -3,12 +3,11 @@ const gameBoard = () => {
     .fill(null)
     .map(() => Array(10).fill(null));
   let ships = {};
-  const isValidPlace = (sPoint, ship) => {
-    let alignment = ship.alignment;
+  const isValidPlace = (sPoint, alignment, length ) => {
     if (alignment == "h") {
       let y = sPoint.y;
-      let len = ship.length - 1;
-      if (y + ship.length > 10) return false;
+      let len = length - 1;
+      if (y + length > 10) return false;
       else {
         while (len >= 0) {
           if (board[sPoint.x][y + len] != null) {
@@ -19,9 +18,9 @@ const gameBoard = () => {
         return true;
       }
     } else if (alignment == "v") {
-      let len = ship.length - 1;
+      let len = length - 1;
       let x = sPoint.x;
-      if (x + ship.length > 10) return false;
+      if (x + length > 10) return false;
       else {
         while (len >= 0) {
           if (board[x + len][sPoint.y] != null) {
@@ -38,7 +37,7 @@ const gameBoard = () => {
     board[attackPoint.x][attackPoint.y] = state;
   };
   const placeShip = (sPoint, ship) => {
-    let validPlace = isValidPlace(sPoint, ship);
+    let validPlace = isValidPlace(sPoint, ship.alignment, ship.length);
     if (validPlace) {
       let key = `${sPoint.x}:${sPoint.y}`;
       ships[key] = ship;
@@ -83,7 +82,7 @@ const gameBoard = () => {
     }
     return true;
   };
-  return { placeShip, receiveAttack, isAllSank };
+  return { placeShip, receiveAttack, isAllSank, isValidPlace};
 };
 
 export { gameBoard };
