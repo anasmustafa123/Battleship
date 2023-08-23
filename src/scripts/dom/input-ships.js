@@ -1,29 +1,25 @@
 const selectShips = () => {
   let ships = [0, 0, 1, 2, 1, 1];
-  let outOfShips = false;
-  let selectedShip;
+  let selectedShip=5;
   const getNextSelectedShip = () => {
-    let key = 5;
+    let key = ships.length-1;
     while (ships[key] == 0 && key > 0) {
       key--;
-    }
-    if (key == 0) {
-      outOfShips = true;
     }
     selectedShip = key;
     return key;
   };
   const isOutOfShips = () => {
-    getNextSelectedShip();
-    return outOfShips;
+    return getNextSelectedShip() == 0;
   };
-  const removeSelectedShip = () => {
+  const updateSelectedShip = () => {
+    console.log(ships);
     if(ships[selectedShip] > 0){
         ships[selectedShip]--;
         return selectedShip;
     };
     return false;
   };
-  return { getNextSelectedShip, isOutOfShips, removeSelectedShip };
+  return { getNextSelectedShip, isOutOfShips, updateSelectedShip };
 };
 export { selectShips };
