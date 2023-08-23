@@ -1,0 +1,94 @@
+:root {
+  --dark-blue: #272343;
+  --light-blue: #e3f6f5;
+  --medium-blue: #bae8e8;
+  --ship-color: rgb(77, 138, 19);
+  --miss-color: rgb(106, 99, 208);
+  --red-color: #ff0000;
+  --green-color: #1bf5af;
+}
+* {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  box-sizing: border-box;
+  text-decoration: none;
+  list-style: none;
+}
+body {
+  background-color: var(--dark-blue);
+}
+header.ships-input-prompt::after {
+  content: "ship";
+}
+
+section.ships-input-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0;
+  gap: 3rem;
+  color: var(--light-blue);
+  transform: scale(1);
+  transition: transform 300ms ease-in-out;
+}
+section.ships-input-container.hide {
+  transform: scale(0);
+}
+header.ships-input-prompt {
+  font-size: 4rem;
+  font-weight: bold;
+}
+.btn {
+  background: var(--light-blue);
+  border-radius: 0.7rem;
+  font-weight: bold;
+}
+.btn:hover {
+  transform: scale(1.05);
+  transition: transform 150ms ease-in-out;
+}
+button.rotate-ship {
+  padding: 0.4rem 15rem;
+  font-size: 2.5rem;
+}
+main.ships-input-grid {
+  display: grid;
+  grid-template: repeat(10, 1fr) / repeat(10, 1fr);
+  width: 30rem;
+  height: 30rem;
+  gap: 2px;
+}
+main.ships-input-grid > .grid-coordinate {
+  background-color: var(--light-blue);
+  border-radius: 0.3rem;
+}
+main.ships-input-grid > .grid-coordinate.hover {
+  background-color: var(--medium-blue);
+}
+main.ships-input-grid > .grid-coordinate.ship {
+  background-color: var(--ship-color);
+}
+main.ships-input-grid > .grid-coordinate.invalid {
+  cursor: not-allowed;
+}
+button.game-start {
+  padding: 0.3rem 3rem;
+  font-size: 2rem;
+  position: absolute;
+  right: 3rem;
+  bottom: 3rem;
+  transform: scale(1);
+  width: auto;
+  transition:  right 200ms ease-in-out, transform 300ms ease-in-out;
+}
+
+button.game-start.hide {
+  transform: scale(0);
+  right: -11rem;
+  cursor: pointer;
+}
