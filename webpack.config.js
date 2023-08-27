@@ -1,8 +1,8 @@
 "use strict";
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-/* const BundleAnalyzerPlugin =
-  require("webpack-bundle-analyzer").BundleAnalyzerPlugin; */
+const BundleAnalyzerPlugin =
+  require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
   
 /* used to copy data from file to dist */
 const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -81,7 +81,7 @@ module.exports = {
       filename: "index.html",
       template: "src/template.html",
     }),
-    /* new BundleAnalyzerPlugin(), */
+    new BundleAnalyzerPlugin(),
     /* copy all assets from src/assets to dist/assets */
     new CopyWebpackPlugin({
       patterns: [{ from: "src/assets", to: "assets" }],
