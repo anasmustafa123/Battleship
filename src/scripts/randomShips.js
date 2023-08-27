@@ -19,14 +19,13 @@ const RandomShips = () => {
         );
       }
     });
-    console.log(gameBoard.ships);
   };
   const placeRandomShip = (shipLength, sPoint, alignment, gameBoard) => {
     while (!gameBoard.isValidPlace(sPoint, alignment, shipLength)) {
       sPoint = getRandomPoint(shipLength);
     }
-    if (!gameBoard.placeShip(sPoint, ship(shipLength, sPoint, alignment)))
-      console.log("GameBoard.isValidPlace are not working");
+    if (!gameBoard.placeShip(sPoint, ship(shipLength, sPoint, alignment))) {
+    }
   };
   const filterBoard = (shipLength, alignment) => {
     return board.filter((value, index) => {

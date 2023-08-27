@@ -3,7 +3,7 @@ import { point } from "../scripts/point";
 
 test("ship --> isSunk --> normal case", () => {
   let spoint = point(0, 0);
-  let alignment = "h"; 
+  let alignment = "h";
   let ship1 = ship(3, spoint, alignment);
   expect(ship1.isSunk()).toBe(false);
   let hitPoint1 = point(0, 0);
@@ -39,7 +39,7 @@ test("ship --> isHit ---> cascading points", () => {
 test("ship --> isHit ---> cascading points", () => {
   let spoint = point(0, 5);
   let alignment = "h";
-  let hitPoint1 = point(2, 6); 
+  let hitPoint1 = point(2, 6);
   let ship1 = ship(5, spoint, alignment);
   expect(ship1.isHit(hitPoint1)).toEqual(false);
   expect(ship1.isHit(hitPoint1)).toEqual(false);
@@ -56,4 +56,33 @@ test("ship --> hitCount --> normaltest", () => {
   let hitPoint3 = point(0, 3);
   ship1.isHit(hitPoint3);
   expect(ship1.getHitCount()).toBe(1);
+});
+
+test("ship --> hitCount --> normaltest", () => {
+  let spoint = point(0, 0);
+  let alignment = "h";
+  let ship1 = ship(5, spoint, alignment);
+  expect(ship1.getHitCount()).toBe(0);
+  let hitPoint1 = point(0, 0);
+  ship1.isHit(hitPoint1);
+  expect(ship1.getHitCount()).toBe(1);
+  let hitPoint3 = point(0, 4);
+  ship1.isHit(hitPoint3);
+  expect(ship1.getHitCount()).toBe(2);
+});
+test("ship --> hitCount --> normaltest", () => {
+  let spoint = point(5, 4);
+  let alignment = "h";
+  let ship1 = ship(3, spoint, alignment);
+  expect(ship1.getHitCount()).toBe(0);
+  let hitPoint1 = point(5, 4);
+  ship1.isHit(hitPoint1);
+  expect(ship1.getHitCount()).toBe(1);
+  let hitPoint3 = point(5, 5);
+  ship1.isHit(hitPoint3);
+  expect(ship1.getHitCount()).toBe(2);
+  let hitPoint4 = point(5, 6);
+  ship1.isHit(hitPoint4);
+  expect(ship1.getHitCount()).toBe(3);
+  expect(ship1.isSunk()).toBe(true);
 });

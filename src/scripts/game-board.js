@@ -3,7 +3,7 @@ const gameBoard = () => {
     .fill(null)
     .map(() => Array(10).fill(null));
   let ships = {};
-  const isValidPlace = (sPoint, alignment, length ) => {
+  const isValidPlace = (sPoint, alignment, length) => {
     if (alignment == "h") {
       let y = sPoint.y;
       let len = length - 1;
@@ -59,30 +59,29 @@ const gameBoard = () => {
     let shipsArray = Object.values(ships);
     for (let i = 0; i < shipsArray.length; i++) {
       let ship = shipsArray[i];
-      if (ship.isHit(attackPoint) == true) return;
+      ship.isHit(attackPoint);
     }
   };
   const receiveAttack = (attackPoint) => {
-    if (board[attackPoint.x][attackPoint.y] == 0) return null;
-    else if (board[attackPoint.x][attackPoint.y] == null) {
-      addAmove(attackPoint, 0);
-      return false;
-    } else {
-      let ship = ships[board[attackPoint.x][attackPoint.y]];
-      addAmove(attackPoint, 0);
-      attackTheShip(attackPoint);
-      return ship.length;
-    }
-  };
-  const isAllSank = () => {
-    let shipsArray = Object.values(ships);
-    for (let i = 0; i < shipsArray.length; i++) {
-      let ship = shipsArray[i];
-      if (!ship.isSunk()) return false;
-    }
-    return true;
-  };
-  return { placeShip, receiveAttack, isAllSank, isValidPlace};
+  if (board[attackPoint.x][attackPoint.y] == 0) return null;
+  else if (board[attackPoint.x][attackPoint.y] === null) {
+    addAmove(attackPoint, 0);
+    return false;
+  } else {
+    let ship = ships[board[attackPoint.x][attackPoint.y]];
+    attackTheShip(attackPoint);
+    addAmove(attackPoint, 0);
+    return ship.length;
+  }
 };
-
+const isAllSank = () => {
+  let shipsArray = Object.values(ships);
+  for (let i = 0; i < shipsArray.length; i++) {
+    let ship = shipsArray[i];
+    if (!ship.isSunk()) return false;
+  }
+  return true;
+};
+return { placeShip, receiveAttack, isAllSank, isValidPlace };
+};
 export { gameBoard };

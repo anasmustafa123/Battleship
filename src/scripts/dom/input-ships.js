@@ -13,13 +13,22 @@ const selectShips = () => {
     return getNextSelectedShip() == 0;
   };
   const updateSelectedShip = () => {
-    console.log(ships);
     if(ships[selectedShip] > 0){
         ships[selectedShip]--;
         return selectedShip;
     };
     return false;
   };
-  return { getNextSelectedShip, isOutOfShips, updateSelectedShip };
+  const getShipName = () => {
+    if(ships[3] == 1){return "Submarine"}
+    let shipNames = {
+      5: "Carrier",
+      4: "BattleShip",
+      3: "Cruiser",
+      2: "Destroyer"
+    }
+    return shipNames[getNextSelectedShip()];
+  }
+  return { getNextSelectedShip, isOutOfShips, updateSelectedShip, getShipName };
 };
 export { selectShips };

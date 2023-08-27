@@ -11,8 +11,17 @@ const createCoordinate = (key, playerBoard, shipsInput) => {
   shipLength = shipsInput.getNextSelectedShip();
   coordinate.classList.add("grid-coordinate");
   coordinate.addEventListener("mouseover", () => {
+    alignment = getCurrentAlignment();
     shipLength = shipsInput.getNextSelectedShip();
-    if (isAvalidCoordinate(playerBoard, shipsInput, shipCoordinate, alignment, shipLength)) {
+    if (
+      isAvalidCoordinate(
+        playerBoard,
+        shipsInput,
+        shipCoordinate,
+        alignment,
+        shipLength
+      )
+    ) {
       remvoeClassNameToTheShip("invalid", key, alignment, shipLength);
       addClassNameToTheShip("hover", key, alignment, shipLength);
     } else {
@@ -26,9 +35,12 @@ const createCoordinate = (key, playerBoard, shipsInput) => {
     if (dropTheShip(playerBoard, shipLength, shipCoordinate, alignment)) {
       addClassNameToTheShip("ship", key, alignment, shipLength);
       shipsInput.updateSelectedShip();
-    }
-    if (shipsInput.isOutOfShips()) {
-      show("game-start");
+      document.querySelector('.ships-input-prompt').setAttribute("name", `${shipsInput.getShipName()}`)
+      if(shipsInput.isOutOfShips()){
+        hide('shipdropping');
+        show('header-name');
+        show("game-start");
+      }
     }
   });
   return coordinate;
@@ -38,27 +50,23 @@ const dropTheShip = (playerBoard, shipLength, shipCoordinate, alignment) => {
   let newShip = ship(shipLength, shipCoordinate, alignment);
   return playerBoard.placeShip(shipCoordinate, newShip);
 };
-const isAvalidCoordinate = (playerBoard, shipsInput, shipCoordinate,alignment, shipLength) => {
+const isAvalidCoordinate = (
+  playerBoard,
+  shipsInput,
+  shipCoordinate,
+  alignment,
+  shipLength
+) => {
   return playerBoard.isValidPlace(shipCoordinate, alignment, shipLength);
 };
 
-const addClassNameToTheShip = (
-  className,
-  key,
-  alignment,
-  selectedShip
-) => {
+const addClassNameToTheShip = (className, key, alignment, selectedShip) => {
   let arr = getShipsCoordinates(key, alignment, selectedShip);
   arr.map((coordinate) => {
     if (coordinate) coordinate.classList.add(className);
   });
 };
-const remvoeClassNameToTheShip = (
-  className,
-  key,
-  alignment,
-  selectedShip
-) => {
+const remvoeClassNameToTheShip = (className, key, alignment, selectedShip) => {
   let arr = getShipsCoordinates(key, alignment, selectedShip);
   arr.map((coordinate) => {
     if (coordinate) coordinate.classList.remove(className);
@@ -82,6 +90,7 @@ const createGrid = (size, playerGameBoard) => {
       createCoordinate(i, playerGameBoard, shipsInput)
     );
   }
+  return shipsGridContainer;
 };
 const getCurrentAlignment = () => {
   const rotateShipBtn = document.querySelector(".rotate-ship");

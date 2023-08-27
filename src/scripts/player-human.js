@@ -1,4 +1,5 @@
 import { player } from "./player";
+import { gridEventListner } from "./dom/GameGridEventListner";
 const human = (name) => {
   let gameEnemy;
   let currentGame;
@@ -12,17 +13,29 @@ const human = (name) => {
   const isLost = () => {
     return proto.board.isAllSank();
   };
-  const setGame = (enemy, game) => {
+  const setGame = (enemy, game, playerGrid) => {
     gameEnemy = enemy;
     currentGame = game;
+    if (playerGrid) {
+      gridEventListner(playerGrid, makeAnAttack, continueGame);
+    }
   };
   const requestAnAttack = () => {
     turn = true;
   };
   const makeAnAttack = (attackPoint) => {
-    lastResult = proto.attack(attackPoint, gameEnemy);
-    turn = false;
+    if (turn) {
+      lastResult = gameEnemy.enemyAttack(attackPoint);
+      return lastResult;
+    } else {
+      return null;
+    }
     /* here: game.nextMove() */
+  };
+  const continueGame = () => {
+    turn = false;
+    console.log('player1  mad a move')
+    currentGame.continueGame();
   };
   const getLastAttackResult = () => lastResult;
   /*here: addEventListners & check if turn is true */
