@@ -30,11 +30,9 @@ const human = (name) => {
     } else {
       return null;
     }
-    /* here: game.nextMove() */
   };
   const continueGame = () => {
     turn = false;
-    console.log('player1  mad a move')
     currentGame.continueGame();
   };
   const getLastAttackResult = () => lastResult;

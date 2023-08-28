@@ -2,8 +2,8 @@
   --dark-blue: #272343;
   --light-blue: #e3f6f5;
   --medium-blue: #bae8e8;
-  --ship-color: rgb(77, 138, 19);
-  --hit-color: rgb(106, 99, 208);
+  --ship-color: rgba(164, 0, 209, 0.474);
+  --hit-color: rgb(74, 67, 167);
   --miss-color: #ff0000;
   --green-color: #1bf5af;
 }
@@ -18,71 +18,41 @@
 body {
   background-color: var(--dark-blue);
 }
-/*  */
-/* section.introduction-container {
-  width: 70%;
-  margin: auto;
-  overflow: hidden;
-}
-.content-container{
-  display: flex;
-  align-items: center;
-  gap: 4rem;
-  height: 30rem;
-}
 
-.introduction-content {
-  background-color: var(--light-blue);
-  padding: 1.5rem 2rem;
-  color: var(--dark-blue);
-  border-radius: 0.7rem;
-  height: fit-content;
+form.introduction-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 2rem;
+  height: 100vh;
+  transition: height 0.5s ease-in-out;
+}
+form.introduction-container.hide{
+  height: 0;
+}
+input#playerName {
+  width: 30rem;
+  height: 4rem;
+  padding-left: 1rem;
+  font-size: 1.2rem;
+  border-radius: 0.5rem;
+}
+button.enterGame.btn {
+  width: 4rem;
+  height: 2rem;
+  font-size: 1.4rem;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  line-height: 3rem;
-  transform: translate(0, 0);
-  transition: transform 0.5s ease-in-out 0.4s, height 0.3s ease 0.9s;
+  transition: height 0.1s ease-in-out 0.5s; 
 }
-section.introduction-container button.proceed {
-  padding: 0.5rem 2rem;
-  border-radius: 0.7rem;
-  transition: transform 0.5s ease-in-out 0.6s, height 0.3s ease 1s;
-}
-section.introduction-container img {
-  transform: translate(0, 0);
-  transition: transform 0.5s ease-in-out 0.4s, height 0.3s ease 0.7s;
-}
-.game-rules::before {
-  content: "Battleship Game:";
-  font-weight: bold;
-}
-section.introduction-container.hide .introduction-content {
-  transform: translate(-70rem, 0);
+form.introduction-container.hide button.enterGame.btn{
   height: 0;
 }
-section.introduction-container.hide img.instruction-img {
-  transform: translate(60rem, 0);
-  height: 0;
+form.introduction-container.hide button.enterGame.btn i{
+  transform: scale(0);
 }
-
-section.introduction-container.hide {
-  height: 0;
-}
-section.introduction-container .introduction-header {
-  font-size: 6rem;
-    margin: 2rem 0 5rem 0;
-    text-align: center;
-  transform: translate(0, 0);
-  color: var(--light-blue);
-  transition: transform 0.3s ease-in-out 0.5s, font-size 0.01s ease-in-out 0.8s;
-}
-section.introduction-container.hide .introduction-header {
-  transform: translate(0, 70rem);
-  font-size: 0;
-  text-align: center;
-} */
-
 /*  */
 header.header-name{
   font-size: 6rem;
@@ -127,20 +97,20 @@ header.ships-input-prompt.hide {
 }
 
 header.ships-input-prompt::after {
-  content: "Carrier";
+  content: " Carrier";
   color: var(--medium-blue);
 }
 header.ships-input-prompt[name = "BattleShip"]::after {
-  content: "BattleShip";
+  content: " BattleShip";
 }
  header.ships-input-prompt[name = "Cruiser"]::after {
-  content: "Cruiser";
+  content: " Cruiser";
 }
 header.ships-input-prompt[name= Submarine ]::after {
-  content: "Submarine";
+  content: " Submarine";
 }
 header.ships-input-prompt[name= Destroyer ]::after {
-  content: "Destroyer";
+  content: " Destroyer";
 }
 section.ships-input-container {
   width: 100vw;
@@ -157,7 +127,7 @@ section.ships-input-container {
   transition: transform 300ms ease-in-out;
 }
 section.ships-input-container.hide {
-  transform: scale(0);
+  display: none;
 }
 
 .btn {
@@ -211,6 +181,7 @@ main.ships-input-grid > .grid-coordinate.hit {
 main.ships-input-grid > .grid-coordinate.miss {
   background-color: var(--miss-color);
 }
+
 main.ships-input-grid.gameon {
   transform: scale(0.8);
   transition: transform 1s ease;

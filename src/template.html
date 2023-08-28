@@ -3,34 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Battleship</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
   </head>
   <body>
-    <!-- <section class="introduction-container">
-      <h1 class="introduction-header">Battleship</h1>
-    <div class="content-container">
-      <div class="introduction-content">
-          <p class="game-rules">
-            a strategy type guessing game. each player place their warships on
-            their grid. without knowing the the opposing player ships location.
-            Players alternate turns calling "shots" at the other player's ships,
-            the objective of the game is to destroy the opposing player's fleet.
-          </p>
-        </div>
-        <button class="proceed btn"> $arrow </button>
-        <img class="instruction-img" src="/assets/battleship-img.png" alt="" />
-    </div>
-  </section> -->
-    <section class="ships-input-container">
+    <form class="introduction-container">
+      <input type="text" name="player name" id="playerName" placeholder="enter your name"  required>
+      <button type="submit" class="enterGame btn"><i class='bx bx-right-arrow-alt'></i></button>
+    </form>
+    <section class="ships-input-container hide">
       <header class="header-name hide">Battleship</header>
-      <div class="shipdropping">
+      <div class="shipdropping hide">
         <header class="ships-input-prompt">place your</header>
         <button class="rotate-ship btn" value="h">
           rotate
           <p class="sticky-rotate">horizontal</p>
         </button>
       </div>
-      <div class="grids-container">
+      <div class="grids-container hide">
         <main class="ships-input-grid player-grid"></main>
       </div>
       <button class="game-start btn hide">start</button>

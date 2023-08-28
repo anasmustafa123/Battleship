@@ -1,4 +1,6 @@
 import { point } from "../point";
+let hitSound = new Audio("../../assets/sounds/sank.mp3");
+let missSound = new Audio("../../assets/sounds/miss.wav");
 const gridEventListner = (playerGrid, checker, continutheGame) => {
   playerGrid.querySelectorAll(".grid-coordinate").forEach((element) => {
     element.addEventListener("click", () => {
@@ -7,6 +9,7 @@ const gridEventListner = (playerGrid, checker, continutheGame) => {
       let result = checker(attackPoint);
       if (result != null) {
         styleTheResult(element, result);
+        makeAttackSound(result);
         continutheGame();
       }
     });
@@ -23,6 +26,17 @@ const styleTheResult = (element, result) => {
     element.classList.add("hit");
   } else if (result == false) {
     element.classList.add("miss");
+  }
+};
+const makeAttackSound = (result) => {
+  if (!result) {
+    hitSound.pause();
+    missSound.currentTime = 1.5;
+    missSound.play();
+  } else {
+    missSound.pause();
+    hitSound.currentTime = 0;
+    hitSound.play();
   }
 };
 export { gridEventListner, styleElement };
