@@ -5,7 +5,7 @@ const human = (name) => {
   let currentGame;
   let turn = false;
   let lastResult = null;
-  let proto = Object.create(player("name"));
+  let proto = Object.create(player(name));
   const enemyAttack = (attackPoint) => {
     let result = proto.board.receiveAttack(attackPoint);
     return result;
