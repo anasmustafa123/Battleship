@@ -15,6 +15,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _point__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../point */ "./src/scripts/point.js");
 
+let hitSound = new Audio("../../assets/sounds/sank.mp3");
+let missSound = new Audio("../../assets/sounds/miss.wav");
 const gridEventListner = (playerGrid, checker, continutheGame) => {
   playerGrid.querySelectorAll(".grid-coordinate").forEach(element => {
     element.addEventListener("click", () => {
@@ -23,6 +25,7 @@ const gridEventListner = (playerGrid, checker, continutheGame) => {
       let result = checker(attackPoint);
       if (result != null) {
         styleTheResult(element, result);
+        makeAttackSound(result);
         continutheGame();
       }
     });
@@ -38,6 +41,17 @@ const styleTheResult = (element, result) => {
     element.classList.add("hit");
   } else if (result == false) {
     element.classList.add("miss");
+  }
+};
+const makeAttackSound = result => {
+  if (!result) {
+    hitSound.pause();
+    missSound.currentTime = 1.5;
+    missSound.play();
+  } else {
+    missSound.pause();
+    hitSound.currentTime = 0;
+    hitSound.play();
   }
 };
 
@@ -96,6 +110,7 @@ const addAllEventListeners = () => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   createEmptyGrid: () => (/* binding */ createEmptyGrid),
 /* harmony export */   createGrid: () => (/* binding */ createGrid)
 /* harmony export */ });
 /* harmony import */ var _input_ships__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./input-ships */ "./src/scripts/dom/input-ships.js");
@@ -106,6 +121,19 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+const createEmptyGrid = (classList, componentClassName) => {
+  const newGrid = document.createElement("main");
+  classList.forEach(className => newGrid.classList.add(className));
+  let i = 0;
+  while (i < 100) {
+    const component = document.createElement("div");
+    component.setAttribute('key', i);
+    component.className = componentClassName;
+    newGrid.appendChild(component);
+    i++;
+  }
+  return newGrid;
+};
 const createCoordinate = (key, playerBoard, shipsInput) => {
   let shipCoordinate = (0,_point__WEBPACK_IMPORTED_MODULE_2__.point)(parseInt(key / 10), parseInt(key % 10));
   const coordinate = document.createElement("div");
@@ -169,8 +197,14 @@ const getShipsCoordinates = (key, alignment, selectedShip) => {
   }
   return arr;
 };
-const createGrid = (size, playerGameBoard) => {
-  const shipsGridContainer = document.querySelector(".ships-input-grid");
+const createGrid = (size, playerGameBoard, classList) => {
+  const shipsGridContainer = document.createElement('main');
+  shipsGridContainer.classList.add("ships-input-grid");
+  if (classList) {
+    classList.forEach(className => {
+      shipsGridContainer.classList.add(className);
+    });
+  }
   let shipsInput = (0,_input_ships__WEBPACK_IMPORTED_MODULE_0__.selectShips)();
   for (let i = 0; i < size; i++) {
     shipsGridContainer.appendChild(createCoordinate(i, playerGameBoard, shipsInput));
@@ -382,11 +416,16 @@ const gameBoard = () => {
     }
     return true;
   };
+  const clearBoard = () => {
+    board = Array(10).fill(null).map(() => Array(10).fill(null));
+    ships = {};
+  };
   return {
     placeShip,
     receiveAttack,
     isAllSank,
-    isValidPlace
+    isValidPlace,
+    clearBoard
   };
 };
 
@@ -403,6 +442,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   game: () => (/* binding */ game)
 /* harmony export */ });
+/* harmony import */ var _scripts_dom_popup__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scripts/dom/popup */ "./src/scripts/dom/popup.js");
+/* harmony import */ var _dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./dom/createPlayerGrid */ "./src/scripts/dom/createPlayerGrid.js");
+
+
 const game = (p1, pl1Grid, p2, pl2Grid) => {
   let turn = 1;
   let player1 = p1;
@@ -414,22 +457,20 @@ const game = (p1, pl1Grid, p2, pl2Grid) => {
   };
   const nexMove = () => {
     if (player2.isLost()) {
-      console.log('player1 won');
+      gameover(1);
     }
     if (player1.isLost()) {
-      console.log('player2 won');
+      gameover(2);
     }
     console.log({
       turn
     });
     if (turn === 1) {
       if (!player2.isLost()) {
-        console.log('player1 make a move');
         player1.requestAnAttack();
       }
     } else if (turn === 2) {
       if (!player1.isLost()) {
-        console.log('player2  make a move');
         player2.requestAnAttack();
       }
     }
@@ -438,9 +479,77 @@ const game = (p1, pl1Grid, p2, pl2Grid) => {
     turn = turn === 1 ? 2 : 1;
     nexMove();
   };
+  const gameover = result => {
+    const gameOverHeading = document.querySelector('.gameover-box h1');
+    if (result === 1) {
+      gameOverHeading.textContent = `Congratulation You Won`;
+    } else if (result === 2) {
+      gameOverHeading.textContent = `You Lost`;
+    }
+    (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_0__.show)('gameover');
+  };
+  const playAgainBtn = document.querySelector('button.play-again');
+  playAgainBtn.addEventListener('click', () => {
+    player1.board.clearBoard();
+    player2.board.clearBoard();
+    const player1Grid = document.querySelector('.ships-input-grid.player-grid');
+    const player2OldGrid = document.querySelector('.ships-input-grid.enemy-grid');
+    const player2NewGrid = (0,_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_1__.createEmptyGrid)(["ships-input-grid", "enemy-grid", "hide"], 'grid-coordinate');
+    player2OldGrid.parentNode.replaceChild(player2NewGrid, player2OldGrid);
+    let newplayerGrid = (0,_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_1__.createGrid)(100, player1.board, ['player-grid']);
+    player1Grid.parentNode.replaceChild(newplayerGrid, player1Grid);
+    (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_0__.hide)('gameover');
+    (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_0__.hide)('ships-input-grid.enemy-grid');
+    (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_0__.hide)('header-name');
+    (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_0__.show)('shipdropping');
+  });
   return {
     continueGame,
     startGame
+  };
+};
+
+
+/***/ }),
+
+/***/ "./src/scripts/nearestPoints.js":
+/*!**************************************!*\
+  !*** ./src/scripts/nearestPoints.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   nearestPoints: () => (/* binding */ nearestPoints)
+/* harmony export */ });
+/* harmony import */ var _point__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./point */ "./src/scripts/point.js");
+
+const nearestPoints = () => {
+  let heap = [];
+  let tempHeap = [];
+  const isExist = (point, pointsArr) => {
+    return pointsArr.find(element => element == point);
+  };
+  const addAdjacentPoints = (thePoint, pointsArr) => {
+    let newPoints = [thePoint + 1, thePoint + 10, thePoint - 1, thePoint - 10];
+    newPoints.forEach(newPoint => {
+      console.log(isExist(newPoint, pointsArr));
+      if (newPoint < 100 && newPoint > 0 && isExist(newPoint, pointsArr)) {
+        heap.push(newPoint);
+      }
+    });
+  };
+  const getLastPoint = () => heap.splice(heap.length - 1, 1);
+  const clearAll = () => {
+    heap.splice(0, heap.length);
+  };
+  const isEmpty = () => heap.length == 0;
+  return {
+    isExist,
+    addAdjacentPoints,
+    getLastPoint,
+    clearAll,
+    isEmpty
   };
 };
 
@@ -460,6 +569,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./player */ "./src/scripts/player.js");
 /* harmony import */ var _point__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./point */ "./src/scripts/point.js");
 /* harmony import */ var _dom_GameGridEventListner__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./dom/GameGridEventListner */ "./src/scripts/dom/GameGridEventListner.js");
+/* harmony import */ var _nearestPoints__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./nearestPoints */ "./src/scripts/nearestPoints.js");
+
 
 
 
@@ -468,6 +579,7 @@ const ai = () => {
   let gameEnemy;
   let currentGame;
   let grid;
+  let possiblePoints;
   const fillArray = len => {
     let pointsArr = [];
     for (let i = 0; i < len; i++) {
@@ -480,19 +592,50 @@ const ai = () => {
   const ChooseRandomAttackPoint = () => {
     let query = Math.floor(Math.random() * (pointsArr.length - 1));
     let queryValue = pointsArr[query];
-    let queryPoint = (0,_point__WEBPACK_IMPORTED_MODULE_1__.point)(parseInt(queryValue / 10), parseInt(queryValue % 10));
+    let queryPoint = coordinateToPoint(queryValue);
     pointsArr = pointsArr.filter(value => {
       return value != queryValue;
     });
     return queryPoint;
   };
+  const coordinateToPoint = coordinate => (0,_point__WEBPACK_IMPORTED_MODULE_1__.point)(parseInt(coordinate / 10), parseInt(coordinate % 10));
   const requestAnAttack = () => {
-    let randomPoint = ChooseRandomAttackPoint();
+    let randomPoint;
+    console.log("randomPoint");
+    if (possiblePoints.isEmpty()) {
+      console.log("------> empty");
+      randomPoint = ChooseRandomAttackPoint();
+    } else {
+      console.log("------> not empty");
+      let randomCoordinate = possiblePoints.getLastPoint();
+      console.log({
+        randomCoordinate
+      });
+      randomPoint = coordinateToPoint(randomCoordinate);
+      console.log({
+        randomPoint
+      });
+    }
     lastResult = gameEnemy.enemyAttack(randomPoint);
+    if (lastResult) {
+      console.log("started");
+      /* possiblePoints.clearAll();  */
+      possiblePoints.addAdjacentPoints(randomPoint.x * 10 + randomPoint.y, pointsArr);
+      let queryValue = randomPoint.x * 10 + randomPoint.y;
+      pointsArr = pointsArr.filter(value => {
+        return value != queryValue;
+      });
+    }
     while (lastResult === null) {
       randomPoint = ChooseRandomAttackPoint();
       lastResult = gameEnemy.enemyAttack(randomPoint);
     }
+
+    /* let randomPoint = ChooseRandomAttackPoint();
+    lastResult = gameEnemy.enemyAttack(randomPoint); 
+    while(lastResult === null){
+      randomPoint = ChooseRandomAttackPoint();
+      lastResult = gameEnemy.enemyAttack(randomPoint);*/
     if (grid) {
       (0,_dom_GameGridEventListner__WEBPACK_IMPORTED_MODULE_2__.styleElement)(grid, randomPoint, lastResult);
     }
@@ -510,6 +653,8 @@ const ai = () => {
     gameEnemy = enemy;
     currentGame = game;
     grid = playerGrid;
+    possiblePoints = (0,_nearestPoints__WEBPACK_IMPORTED_MODULE_3__.nearestPoints)();
+    console.log(possiblePoints);
   };
   const getLastAttackResult = () => lastResult;
   return Object.assign(proto, {
@@ -543,7 +688,7 @@ const human = name => {
   let currentGame;
   let turn = false;
   let lastResult = null;
-  let proto = Object.create((0,_player__WEBPACK_IMPORTED_MODULE_0__.player)("name"));
+  let proto = Object.create((0,_player__WEBPACK_IMPORTED_MODULE_0__.player)(name));
   const enemyAttack = attackPoint => {
     let result = proto.board.receiveAttack(attackPoint);
     return result;
@@ -568,12 +713,9 @@ const human = name => {
     } else {
       return null;
     }
-    /* here: game.nextMove() */
   };
-
   const continueGame = () => {
     turn = false;
-    console.log('player1  mad a move');
     currentGame.continueGame();
   };
   const getLastAttackResult = () => lastResult;
@@ -785,8 +927,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `:root {
   --dark-blue: #272343;
   --light-blue: #e3f6f5;
   --medium-blue: #bae8e8;
-  --ship-color: rgb(77, 138, 19);
-  --hit-color: rgb(106, 99, 208);
+  --ship-color: rgba(164, 0, 209, 0.474);
+  --hit-color: rgb(74, 67, 167);
   --miss-color: #ff0000;
   --green-color: #1bf5af;
 }
@@ -800,100 +942,105 @@ ___CSS_LOADER_EXPORT___.push([module.id, `:root {
 }
 body {
   background-color: var(--dark-blue);
-}
-/*  */
-/* section.introduction-container {
-  width: 70%;
-  margin: auto;
-  overflow: hidden;
-}
-.content-container{
-  display: flex;
-  align-items: center;
-  gap: 4rem;
-  height: 30rem;
+  font-size: 100%;
 }
 
-.introduction-content {
-  background-color: var(--light-blue);
-  padding: 1.5rem 2rem;
-  color: var(--dark-blue);
-  border-radius: 0.7rem;
-  height: fit-content;
+form.introduction-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 2rem;
+  height: 100vh;
+  transition: height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+form.introduction-container.hide {
+  height: 0;
+  opacity: 0;
+}
+input#playerName {
+  width: 30rem;
+  height: 4rem;
+  padding-left: 1rem;
+  font-size: 1.2rem;
+  border-radius: 0.5rem;
+}
+button.enterGame.btn {
+  width: 4rem;
+  height: 2rem;
+  font-size: 1.4rem;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  line-height: 3rem;
-  transform: translate(0, 0);
-  transition: transform 0.5s ease-in-out 0.4s, height 0.3s ease 0.9s;
+  transition: height 0.1s ease-in-out 0.5s;
 }
-section.introduction-container button.proceed {
-  padding: 0.5rem 2rem;
-  border-radius: 0.7rem;
-  transition: transform 0.5s ease-in-out 0.6s, height 0.3s ease 1s;
-}
-section.introduction-container img {
-  transform: translate(0, 0);
-  transition: transform 0.5s ease-in-out 0.4s, height 0.3s ease 0.7s;
-}
-.game-rules::before {
-  content: "Battleship Game:";
-  font-weight: bold;
-}
-section.introduction-container.hide .introduction-content {
-  transform: translate(-70rem, 0);
-  height: 0;
-}
-section.introduction-container.hide img.instruction-img {
-  transform: translate(60rem, 0);
-  height: 0;
-}
-
-section.introduction-container.hide {
-  height: 0;
-}
-section.introduction-container .introduction-header {
-  font-size: 6rem;
-    margin: 2rem 0 5rem 0;
-    text-align: center;
-  transform: translate(0, 0);
-  color: var(--light-blue);
-  transition: transform 0.3s ease-in-out 0.5s, font-size 0.01s ease-in-out 0.8s;
-}
-section.introduction-container.hide .introduction-header {
-  transform: translate(0, 70rem);
-  font-size: 0;
-  text-align: center;
-} */
 
 /*  */
-header.header-name{
+section.gameover {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  background: #bae8e87c;
+  pointer-events: all;
+  transform: scale(1);
+  transition: height 0.3s ease-in-out, transform 0.2s ease 0.35s;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+}
+section.gameover.hide {
+  height: 0;
+  transform: scale(0);
+}
+.gameover-box {
+  width: 40%;
+  text-align: center;
+  background-color: var(--light-blue);
+  padding: 3rem;
+  border-radius: 1.5rem;
+}
+.gameover-box h1 {
+  font-size: 4.5rem;
+  padding-bottom: 3rem;
+}
+
+button.play-again.btn {
+  padding: 0.5rem 2rem;
+  font-size: 1.5rem;
+  background-color: var(--dark-blue);
+  color: var(--light-blue);
+}
+/*  */
+header.header-name {
   font-size: 6rem;
   font-weight: bold;
-  position: relative;
-  right: 0;
-  transform: translate(0, 0);
-  transition: font-size  ease-in-out 300ms, right 700ms ease-in-out, transform 300ms 100ms;
+  height: 8rem;
+  transform: translateX(0);
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out,
+    height 0.5s ease-in-out;
 }
 .shipdropping {
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 4rem;
-  position: relative;
-  right: 0;
   height: 14rem;
-  transition: height 300ms ease-out 400ms,right 700ms ease-in-out, transform 300ms 100ms;
+  transform: translateX(0);
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out,
+    height 0.5s ease-in-out;
 }
 .shipdropping.hide {
-  right: 80rem;
-  transform: translate(2rem, 0);
+  opacity: 0;
   height: 0;
+  transform: translateX(-16rem);
 }
 header.header-name.hide {
-  right: -54rem;
-  transform: translate(-2rem, 0);
-  font-size: 0;
+  opacity: 0;
+  height: 0;
+  transform: translateX(-16rem);
 }
 header.ships-input-prompt {
   font-size: 4rem;
@@ -901,7 +1048,8 @@ header.ships-input-prompt {
   position: relative;
   right: 0;
   transform: translate(0, 0);
-  transition: font-size  ease-in-out 1.2s, right 700ms ease-in-out, transform 300ms 100ms;
+  transition: font-size ease-in-out 1.2s, right 700ms ease-in-out,
+    transform 300ms 100ms;
 }
 header.ships-input-prompt.hide {
   right: 54rem;
@@ -910,25 +1058,25 @@ header.ships-input-prompt.hide {
 }
 
 header.ships-input-prompt::after {
-  content: "Carrier";
+  content: " Carrier";
   color: var(--medium-blue);
 }
-header.ships-input-prompt[name = "BattleShip"]::after {
-  content: "BattleShip";
+header.ships-input-prompt[name="BattleShip"]::after {
+  content: " BattleShip";
 }
- header.ships-input-prompt[name = "Cruiser"]::after {
-  content: "Cruiser";
+header.ships-input-prompt[name="Cruiser"]::after {
+  content: " Cruiser";
 }
-header.ships-input-prompt[name= Submarine ]::after {
-  content: "Submarine";
+header.ships-input-prompt[name="Submarine"]::after {
+  content: " Submarine";
 }
-header.ships-input-prompt[name= Destroyer ]::after {
-  content: "Destroyer";
+header.ships-input-prompt[name="Destroyer"]::after {
+  content: " Destroyer";
 }
 section.ships-input-container {
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -940,7 +1088,7 @@ section.ships-input-container {
   transition: transform 300ms ease-in-out;
 }
 section.ships-input-container.hide {
-  transform: scale(0);
+  display: none;
 }
 
 .btn {
@@ -958,7 +1106,7 @@ button.rotate-ship {
   font-size: 2.5rem;
   position: relative;
 }
-p.sticky-rotate{
+p.sticky-rotate {
   position: absolute;
   left: 2rem;
   top: 50%;
@@ -994,46 +1142,158 @@ main.ships-input-grid > .grid-coordinate.hit {
 main.ships-input-grid > .grid-coordinate.miss {
   background-color: var(--miss-color);
 }
+
 main.ships-input-grid.gameon {
   transform: scale(0.8);
-  transition: transform 1s ease;
+  transition: transform 0.5s ease-in-out;
 }
-main.ships-input-grid.enemy-grid{
+main.ships-input-grid.enemy-grid {
   position: relative;
-  transform: translate(0, 0);
-  width: 30rem;
+  transform: translateX(0);
   transition: transform 1s ease, width 300ms ease;
 }
-main.ships-input-grid.enemy-grid.hide{
+main.ships-input-grid.enemy-grid.hide {
   width: 0;
-  transform: translate(45rem, 0);
+  transform: translateX(40rem);
 }
 button.game-start {
-  padding: 0.3rem 3rem;
+  padding: 0.3rem 2rem;
   font-size: 2rem;
   position: absolute;
   right: 3rem;
   bottom: 3rem;
-  /* transform: scale(1); */
   width: auto;
-  transition:  right 300ms ease-in-out;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: right 300ms ease-in-out;
 }
 
 button.game-start.hide {
   /* transform: scale(0); */
   right: -11rem;
 }
-.grids-container{
+.grids-container {
   display: flex;
-  gap:  2rem;
+  gap: 2rem;
   position: relative;
-  transform: translate(0,0);
-  transition: transform 0.5s ease-in-out 0.1s, height 0.4s ease-in-out 0.6s;
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 0.5s ease-in-out 0.4s, opacity 0.6s ease-in-out 0.4s;
 }
-.grids-container.hide{
-  transform: translate(0, 50rem);
-  height: 0;
-}`, "",{"version":3,"sources":["webpack://./src/styles/game.css"],"names":[],"mappings":"AAAA;EACE,oBAAoB;EACpB,qBAAqB;EACrB,sBAAsB;EACtB,8BAA8B;EAC9B,8BAA8B;EAC9B,qBAAqB;EACrB,sBAAsB;AACxB;AACA;EACE,UAAU;EACV,SAAS;EACT,SAAS;EACT,sBAAsB;EACtB,qBAAqB;EACrB,gBAAgB;AAClB;AACA;EACE,kCAAkC;AACpC;AACA,KAAK;AACL;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;GA8DG;;AAEH,KAAK;AACL;EACE,eAAe;EACf,iBAAiB;EACjB,kBAAkB;EAClB,QAAQ;EACR,0BAA0B;EAC1B,wFAAwF;AAC1F;AACA;EACE,kBAAkB;EAClB,aAAa;EACb,sBAAsB;EACtB,SAAS;EACT,kBAAkB;EAClB,QAAQ;EACR,aAAa;EACb,sFAAsF;AACxF;AACA;EACE,YAAY;EACZ,6BAA6B;EAC7B,SAAS;AACX;AACA;EACE,aAAa;EACb,8BAA8B;EAC9B,YAAY;AACd;AACA;EACE,eAAe;EACf,iBAAiB;EACjB,kBAAkB;EAClB,QAAQ;EACR,0BAA0B;EAC1B,uFAAuF;AACzF;AACA;EACE,YAAY;EACZ,6BAA6B;EAC7B,YAAY;AACd;;AAEA;EACE,kBAAkB;EAClB,yBAAyB;AAC3B;AACA;EACE,qBAAqB;AACvB;CACC;EACC,kBAAkB;AACpB;AACA;EACE,oBAAoB;AACtB;AACA;EACE,oBAAoB;AACtB;AACA;EACE,YAAY;EACZ,aAAa;EACb,gBAAgB;EAChB,kBAAkB;EAClB,aAAa;EACb,sBAAsB;EACtB,mBAAmB;EACnB,eAAe;EACf,SAAS;EACT,wBAAwB;EACxB,mBAAmB;EACnB,uCAAuC;AACzC;AACA;EACE,mBAAmB;AACrB;;AAEA;EACE,6BAA6B;EAC7B,qBAAqB;EACrB,iBAAiB;EACjB,eAAe;AACjB;AACA;EACE,sBAAsB;EACtB,uCAAuC;AACzC;AACA;EACE,qBAAqB;EACrB,iBAAiB;EACjB,kBAAkB;AACpB;AACA;EACE,kBAAkB;EAClB,UAAU;EACV,QAAQ;EACR,6BAA6B;EAC7B,8BAA8B;EAC9B,iBAAiB;EACjB,sBAAsB;EACtB,mBAAmB;AACrB;AACA;EACE,aAAa;EACb,gDAAgD;EAChD,YAAY;EACZ,aAAa;EACb,QAAQ;AACV;AACA;EACE,mCAAmC;EACnC,qBAAqB;AACvB;AACA;EACE,oCAAoC;AACtC;AACA;EACE,mCAAmC;AACrC;AACA;EACE,mBAAmB;AACrB;AACA;EACE,kCAAkC;AACpC;AACA;EACE,mCAAmC;AACrC;AACA;EACE,qBAAqB;EACrB,6BAA6B;AAC/B;AACA;EACE,kBAAkB;EAClB,0BAA0B;EAC1B,YAAY;EACZ,+CAA+C;AACjD;AACA;EACE,QAAQ;EACR,8BAA8B;AAChC;AACA;EACE,oBAAoB;EACpB,eAAe;EACf,kBAAkB;EAClB,WAAW;EACX,YAAY;EACZ,yBAAyB;EACzB,WAAW;EACX,oCAAoC;AACtC;;AAEA;EACE,yBAAyB;EACzB,aAAa;AACf;AACA;EACE,aAAa;EACb,UAAU;EACV,kBAAkB;EAClB,yBAAyB;EACzB,yEAAyE;AAC3E;AACA;EACE,8BAA8B;EAC9B,SAAS;AACX","sourcesContent":[":root {\n  --dark-blue: #272343;\n  --light-blue: #e3f6f5;\n  --medium-blue: #bae8e8;\n  --ship-color: rgb(77, 138, 19);\n  --hit-color: rgb(106, 99, 208);\n  --miss-color: #ff0000;\n  --green-color: #1bf5af;\n}\n* {\n  padding: 0;\n  margin: 0;\n  border: 0;\n  box-sizing: border-box;\n  text-decoration: none;\n  list-style: none;\n}\nbody {\n  background-color: var(--dark-blue);\n}\n/*  */\n/* section.introduction-container {\n  width: 70%;\n  margin: auto;\n  overflow: hidden;\n}\n.content-container{\n  display: flex;\n  align-items: center;\n  gap: 4rem;\n  height: 30rem;\n}\n\n.introduction-content {\n  background-color: var(--light-blue);\n  padding: 1.5rem 2rem;\n  color: var(--dark-blue);\n  border-radius: 0.7rem;\n  height: fit-content;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  line-height: 3rem;\n  transform: translate(0, 0);\n  transition: transform 0.5s ease-in-out 0.4s, height 0.3s ease 0.9s;\n}\nsection.introduction-container button.proceed {\n  padding: 0.5rem 2rem;\n  border-radius: 0.7rem;\n  transition: transform 0.5s ease-in-out 0.6s, height 0.3s ease 1s;\n}\nsection.introduction-container img {\n  transform: translate(0, 0);\n  transition: transform 0.5s ease-in-out 0.4s, height 0.3s ease 0.7s;\n}\n.game-rules::before {\n  content: \"Battleship Game:\";\n  font-weight: bold;\n}\nsection.introduction-container.hide .introduction-content {\n  transform: translate(-70rem, 0);\n  height: 0;\n}\nsection.introduction-container.hide img.instruction-img {\n  transform: translate(60rem, 0);\n  height: 0;\n}\n\nsection.introduction-container.hide {\n  height: 0;\n}\nsection.introduction-container .introduction-header {\n  font-size: 6rem;\n    margin: 2rem 0 5rem 0;\n    text-align: center;\n  transform: translate(0, 0);\n  color: var(--light-blue);\n  transition: transform 0.3s ease-in-out 0.5s, font-size 0.01s ease-in-out 0.8s;\n}\nsection.introduction-container.hide .introduction-header {\n  transform: translate(0, 70rem);\n  font-size: 0;\n  text-align: center;\n} */\n\n/*  */\nheader.header-name{\n  font-size: 6rem;\n  font-weight: bold;\n  position: relative;\n  right: 0;\n  transform: translate(0, 0);\n  transition: font-size  ease-in-out 300ms, right 700ms ease-in-out, transform 300ms 100ms;\n}\n.shipdropping {\n  text-align: center;\n  display: flex;\n  flex-direction: column;\n  gap: 4rem;\n  position: relative;\n  right: 0;\n  height: 14rem;\n  transition: height 300ms ease-out 400ms,right 700ms ease-in-out, transform 300ms 100ms;\n}\n.shipdropping.hide {\n  right: 80rem;\n  transform: translate(2rem, 0);\n  height: 0;\n}\nheader.header-name.hide {\n  right: -54rem;\n  transform: translate(-2rem, 0);\n  font-size: 0;\n}\nheader.ships-input-prompt {\n  font-size: 4rem;\n  font-weight: bold;\n  position: relative;\n  right: 0;\n  transform: translate(0, 0);\n  transition: font-size  ease-in-out 1.2s, right 700ms ease-in-out, transform 300ms 100ms;\n}\nheader.ships-input-prompt.hide {\n  right: 54rem;\n  transform: translate(2rem, 0);\n  font-size: 0;\n}\n\nheader.ships-input-prompt::after {\n  content: \"Carrier\";\n  color: var(--medium-blue);\n}\nheader.ships-input-prompt[name = \"BattleShip\"]::after {\n  content: \"BattleShip\";\n}\n header.ships-input-prompt[name = \"Cruiser\"]::after {\n  content: \"Cruiser\";\n}\nheader.ships-input-prompt[name= Submarine ]::after {\n  content: \"Submarine\";\n}\nheader.ships-input-prompt[name= Destroyer ]::after {\n  content: \"Destroyer\";\n}\nsection.ships-input-container {\n  width: 100vw;\n  height: 100vh;\n  overflow: hidden;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  padding: 2rem 0;\n  gap: 3rem;\n  color: var(--light-blue);\n  transform: scale(1);\n  transition: transform 300ms ease-in-out;\n}\nsection.ships-input-container.hide {\n  transform: scale(0);\n}\n\n.btn {\n  background: var(--light-blue);\n  border-radius: 0.7rem;\n  font-weight: bold;\n  cursor: pointer;\n}\n.btn:hover {\n  transform: scale(1.05);\n  transition: transform 150ms ease-in-out;\n}\nbutton.rotate-ship {\n  padding: 0.4rem 15rem;\n  font-size: 2.5rem;\n  position: relative;\n}\np.sticky-rotate{\n  position: absolute;\n  left: 2rem;\n  top: 50%;\n  transform: translate(0, -50%);\n  background: var(--medium-blue);\n  font-size: 1.5rem;\n  padding: 0.2rem 1.5rem;\n  border-radius: 1rem;\n}\nmain.ships-input-grid {\n  display: grid;\n  grid-template: repeat(10, 1fr) / repeat(10, 1fr);\n  width: 30rem;\n  height: 30rem;\n  gap: 2px;\n}\nmain.ships-input-grid > .grid-coordinate {\n  background-color: var(--light-blue);\n  border-radius: 0.3rem;\n}\nmain.ships-input-grid > .grid-coordinate.hover {\n  background-color: var(--medium-blue);\n}\nmain.ships-input-grid > .grid-coordinate.ship {\n  background-color: var(--ship-color);\n}\nmain.ships-input-grid > .grid-coordinate.invalid {\n  cursor: not-allowed;\n}\nmain.ships-input-grid > .grid-coordinate.hit {\n  background-color: var(--hit-color);\n}\nmain.ships-input-grid > .grid-coordinate.miss {\n  background-color: var(--miss-color);\n}\nmain.ships-input-grid.gameon {\n  transform: scale(0.8);\n  transition: transform 1s ease;\n}\nmain.ships-input-grid.enemy-grid{\n  position: relative;\n  transform: translate(0, 0);\n  width: 30rem;\n  transition: transform 1s ease, width 300ms ease;\n}\nmain.ships-input-grid.enemy-grid.hide{\n  width: 0;\n  transform: translate(45rem, 0);\n}\nbutton.game-start {\n  padding: 0.3rem 3rem;\n  font-size: 2rem;\n  position: absolute;\n  right: 3rem;\n  bottom: 3rem;\n  /* transform: scale(1); */\n  width: auto;\n  transition:  right 300ms ease-in-out;\n}\n\nbutton.game-start.hide {\n  /* transform: scale(0); */\n  right: -11rem;\n}\n.grids-container{\n  display: flex;\n  gap:  2rem;\n  position: relative;\n  transform: translate(0,0);\n  transition: transform 0.5s ease-in-out 0.1s, height 0.4s ease-in-out 0.6s;\n}\n.grids-container.hide{\n  transform: translate(0, 50rem);\n  height: 0;\n}"],"sourceRoot":""}]);
+.grids-container.hide {
+  transform: translateY(15rem);
+  opacity: 0;
+}
+
+@media (max-width: 1050px) {
+  main.ships-input-grid.player-grid.gameon,
+  main.ships-input-grid.enemy-grid {
+    width: 24rem;
+    height: 24rem;
+  }
+  .gameover-box {
+    width: auto;
+  }
+}
+@media (max-width: 870px) {
+  main.ships-input-grid.player-grid.gameon,
+  main.ships-input-grid.enemy-grid {
+    width: 20rem;
+    height: 20rem;
+  }
+
+  main.ships-input-grid {
+    gap: 1px;
+  }
+}
+@media (max-width: 750px) {
+  .grids-container {
+    flex-direction: column;
+  }
+}
+@media (max-width: 650px) {
+  main.ships-input-grid.player-grid {
+    width: 24rem;
+    height: 24rem;
+  }
+  button.rotate-ship {
+    padding: 0.4rem 10rem;
+    font-size: 1.5rem;
+  }
+  header.ships-input-prompt {
+    font-size: 2.5rem;
+  }
+  p.sticky-rotate {
+    font-size: 1rem;
+    padding: 0.2rem 1rem;
+  }
+  header.header-name {
+    font-size: 5rem;
+  }
+  input#playerName {
+    width: 22rem;
+  }
+  button.game-start {
+    padding: 0.3rem 1rem;
+    font-size: 1.5rem;
+    right: 2rem;
+    bottom: 2rem;
+    border-radius: 1rem;
+  }
+}
+@media (max-width: 470px){
+  .gameover-box {
+    width: auto;
+    padding: 2rem;
+  }
+  .gameover-box h1{
+
+  }
+  .gameover-box h1 {
+    font-size: 1.5rem;
+    padding-bottom: 2rem;
+}
+}
+@media (max-width: 390px) {
+  button.rotate-ship {
+    padding: 0.4rem 6rem;
+    font-size: 1rem;
+  }
+  header.ships-input-prompt {
+    font-size: 2rem;
+  }
+  input#playerName {
+    width: 17rem;
+  }
+  main.ships-input-grid.player-grid,
+  main.ships-input-grid.enemy-grid {
+    width: 19rem;
+    height: 19rem;
+  }
+  button.rotate-ship {
+    padding: 0.4rem 7rem;
+    font-size: 1.5rem;
+  }
+  p.sticky-rotate {
+    font-size: 0.5rem;
+    padding: 0.2rem 0.5rem;
+  }
+  .rotate-ship.btn {
+    padding: 0.4rem 7rem;
+  }
+  header.header-name {
+    font-size: 3rem;
+  }
+  /*  button.game-start {
+    padding: 0.3rem 1rem;
+    font-size: 1.5rem;
+    right: 2rem;
+    bottom: 2rem;
+    border-radius: 1rem;
+  } */
+}
+`, "",{"version":3,"sources":["webpack://./src/styles/game.css"],"names":[],"mappings":"AAAA;EACE,oBAAoB;EACpB,qBAAqB;EACrB,sBAAsB;EACtB,sCAAsC;EACtC,6BAA6B;EAC7B,qBAAqB;EACrB,sBAAsB;AACxB;AACA;EACE,UAAU;EACV,SAAS;EACT,SAAS;EACT,sBAAsB;EACtB,qBAAqB;EACrB,gBAAgB;AAClB;AACA;EACE,kCAAkC;EAClC,eAAe;AACjB;;AAEA;EACE,aAAa;EACb,uBAAuB;EACvB,mBAAmB;EACnB,sBAAsB;EACtB,SAAS;EACT,aAAa;EACb,6DAA6D;AAC/D;AACA;EACE,SAAS;EACT,UAAU;AACZ;AACA;EACE,YAAY;EACZ,YAAY;EACZ,kBAAkB;EAClB,iBAAiB;EACjB,qBAAqB;AACvB;AACA;EACE,WAAW;EACX,YAAY;EACZ,iBAAiB;EACjB,oBAAoB;EACpB,uBAAuB;EACvB,mBAAmB;EACnB,wCAAwC;AAC1C;;AAEA,KAAK;AACL;EACE,aAAa;EACb,aAAa;EACb,uBAAuB;EACvB,mBAAmB;EACnB,SAAS;EACT,qBAAqB;EACrB,mBAAmB;EACnB,mBAAmB;EACnB,8DAA8D;EAC9D,eAAe;EACf,MAAM;EACN,OAAO;EACP,YAAY;AACd;AACA;EACE,SAAS;EACT,mBAAmB;AACrB;AACA;EACE,UAAU;EACV,kBAAkB;EAClB,mCAAmC;EACnC,aAAa;EACb,qBAAqB;AACvB;AACA;EACE,iBAAiB;EACjB,oBAAoB;AACtB;;AAEA;EACE,oBAAoB;EACpB,iBAAiB;EACjB,kCAAkC;EAClC,wBAAwB;AAC1B;AACA,KAAK;AACL;EACE,eAAe;EACf,iBAAiB;EACjB,YAAY;EACZ,wBAAwB;EACxB;2BACyB;AAC3B;AACA;EACE,kBAAkB;EAClB,aAAa;EACb,sBAAsB;EACtB,SAAS;EACT,aAAa;EACb,wBAAwB;EACxB;2BACyB;AAC3B;AACA;EACE,UAAU;EACV,SAAS;EACT,6BAA6B;AAC/B;AACA;EACE,UAAU;EACV,SAAS;EACT,6BAA6B;AAC/B;AACA;EACE,eAAe;EACf,iBAAiB;EACjB,kBAAkB;EAClB,QAAQ;EACR,0BAA0B;EAC1B;yBACuB;AACzB;AACA;EACE,YAAY;EACZ,6BAA6B;EAC7B,YAAY;AACd;;AAEA;EACE,mBAAmB;EACnB,yBAAyB;AAC3B;AACA;EACE,sBAAsB;AACxB;AACA;EACE,mBAAmB;AACrB;AACA;EACE,qBAAqB;AACvB;AACA;EACE,qBAAqB;AACvB;AACA;EACE,YAAY;EACZ,aAAa;EACb,kBAAkB;EAClB,kBAAkB;EAClB,aAAa;EACb,sBAAsB;EACtB,mBAAmB;EACnB,eAAe;EACf,SAAS;EACT,wBAAwB;EACxB,mBAAmB;EACnB,uCAAuC;AACzC;AACA;EACE,aAAa;AACf;;AAEA;EACE,6BAA6B;EAC7B,qBAAqB;EACrB,iBAAiB;EACjB,eAAe;AACjB;AACA;EACE,sBAAsB;EACtB,uCAAuC;AACzC;AACA;EACE,qBAAqB;EACrB,iBAAiB;EACjB,kBAAkB;AACpB;AACA;EACE,kBAAkB;EAClB,UAAU;EACV,QAAQ;EACR,6BAA6B;EAC7B,8BAA8B;EAC9B,iBAAiB;EACjB,sBAAsB;EACtB,mBAAmB;AACrB;AACA;EACE,aAAa;EACb,gDAAgD;EAChD,YAAY;EACZ,aAAa;EACb,QAAQ;AACV;AACA;EACE,mCAAmC;EACnC,qBAAqB;AACvB;AACA;EACE,oCAAoC;AACtC;AACA;EACE,mCAAmC;AACrC;AACA;EACE,mBAAmB;AACrB;AACA;EACE,kCAAkC;AACpC;AACA;EACE,mCAAmC;AACrC;;AAEA;EACE,qBAAqB;EACrB,sCAAsC;AACxC;AACA;EACE,kBAAkB;EAClB,wBAAwB;EACxB,+CAA+C;AACjD;AACA;EACE,QAAQ;EACR,4BAA4B;AAC9B;AACA;EACE,oBAAoB;EACpB,eAAe;EACf,kBAAkB;EAClB,WAAW;EACX,YAAY;EACZ,WAAW;EACX,oBAAoB;EACpB,uBAAuB;EACvB,mBAAmB;EACnB,mCAAmC;AACrC;;AAEA;EACE,yBAAyB;EACzB,aAAa;AACf;AACA;EACE,aAAa;EACb,SAAS;EACT,kBAAkB;EAClB,wBAAwB;EACxB,UAAU;EACV,0EAA0E;AAC5E;AACA;EACE,4BAA4B;EAC5B,UAAU;AACZ;;AAEA;EACE;;IAEE,YAAY;IACZ,aAAa;EACf;EACA;IACE,WAAW;EACb;AACF;AACA;EACE;;IAEE,YAAY;IACZ,aAAa;EACf;;EAEA;IACE,QAAQ;EACV;AACF;AACA;EACE;IACE,sBAAsB;EACxB;AACF;AACA;EACE;IACE,YAAY;IACZ,aAAa;EACf;EACA;IACE,qBAAqB;IACrB,iBAAiB;EACnB;EACA;IACE,iBAAiB;EACnB;EACA;IACE,eAAe;IACf,oBAAoB;EACtB;EACA;IACE,eAAe;EACjB;EACA;IACE,YAAY;EACd;EACA;IACE,oBAAoB;IACpB,iBAAiB;IACjB,WAAW;IACX,YAAY;IACZ,mBAAmB;EACrB;AACF;AACA;EACE;IACE,WAAW;IACX,aAAa;EACf;EACA;;EAEA;EACA;IACE,iBAAiB;IACjB,oBAAoB;AACxB;AACA;AACA;EACE;IACE,oBAAoB;IACpB,eAAe;EACjB;EACA;IACE,eAAe;EACjB;EACA;IACE,YAAY;EACd;EACA;;IAEE,YAAY;IACZ,aAAa;EACf;EACA;IACE,oBAAoB;IACpB,iBAAiB;EACnB;EACA;IACE,iBAAiB;IACjB,sBAAsB;EACxB;EACA;IACE,oBAAoB;EACtB;EACA;IACE,eAAe;EACjB;EACA;;;;;;KAMG;AACL","sourcesContent":[":root {\n  --dark-blue: #272343;\n  --light-blue: #e3f6f5;\n  --medium-blue: #bae8e8;\n  --ship-color: rgba(164, 0, 209, 0.474);\n  --hit-color: rgb(74, 67, 167);\n  --miss-color: #ff0000;\n  --green-color: #1bf5af;\n}\n* {\n  padding: 0;\n  margin: 0;\n  border: 0;\n  box-sizing: border-box;\n  text-decoration: none;\n  list-style: none;\n}\nbody {\n  background-color: var(--dark-blue);\n  font-size: 100%;\n}\n\nform.introduction-container {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  flex-direction: column;\n  gap: 2rem;\n  height: 100vh;\n  transition: height 0.5s ease-in-out, opacity 0.5s ease-in-out;\n}\nform.introduction-container.hide {\n  height: 0;\n  opacity: 0;\n}\ninput#playerName {\n  width: 30rem;\n  height: 4rem;\n  padding-left: 1rem;\n  font-size: 1.2rem;\n  border-radius: 0.5rem;\n}\nbutton.enterGame.btn {\n  width: 4rem;\n  height: 2rem;\n  font-size: 1.4rem;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  transition: height 0.1s ease-in-out 0.5s;\n}\n\n/*  */\nsection.gameover {\n  height: 100vh;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  gap: 2rem;\n  background: #bae8e87c;\n  pointer-events: all;\n  transform: scale(1);\n  transition: height 0.3s ease-in-out, transform 0.2s ease 0.35s;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n}\nsection.gameover.hide {\n  height: 0;\n  transform: scale(0);\n}\n.gameover-box {\n  width: 40%;\n  text-align: center;\n  background-color: var(--light-blue);\n  padding: 3rem;\n  border-radius: 1.5rem;\n}\n.gameover-box h1 {\n  font-size: 4.5rem;\n  padding-bottom: 3rem;\n}\n\nbutton.play-again.btn {\n  padding: 0.5rem 2rem;\n  font-size: 1.5rem;\n  background-color: var(--dark-blue);\n  color: var(--light-blue);\n}\n/*  */\nheader.header-name {\n  font-size: 6rem;\n  font-weight: bold;\n  height: 8rem;\n  transform: translateX(0);\n  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out,\n    height 0.5s ease-in-out;\n}\n.shipdropping {\n  text-align: center;\n  display: flex;\n  flex-direction: column;\n  gap: 4rem;\n  height: 14rem;\n  transform: translateX(0);\n  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out,\n    height 0.5s ease-in-out;\n}\n.shipdropping.hide {\n  opacity: 0;\n  height: 0;\n  transform: translateX(-16rem);\n}\nheader.header-name.hide {\n  opacity: 0;\n  height: 0;\n  transform: translateX(-16rem);\n}\nheader.ships-input-prompt {\n  font-size: 4rem;\n  font-weight: bold;\n  position: relative;\n  right: 0;\n  transform: translate(0, 0);\n  transition: font-size ease-in-out 1.2s, right 700ms ease-in-out,\n    transform 300ms 100ms;\n}\nheader.ships-input-prompt.hide {\n  right: 54rem;\n  transform: translate(2rem, 0);\n  font-size: 0;\n}\n\nheader.ships-input-prompt::after {\n  content: \" Carrier\";\n  color: var(--medium-blue);\n}\nheader.ships-input-prompt[name=\"BattleShip\"]::after {\n  content: \" BattleShip\";\n}\nheader.ships-input-prompt[name=\"Cruiser\"]::after {\n  content: \" Cruiser\";\n}\nheader.ships-input-prompt[name=\"Submarine\"]::after {\n  content: \" Submarine\";\n}\nheader.ships-input-prompt[name=\"Destroyer\"]::after {\n  content: \" Destroyer\";\n}\nsection.ships-input-container {\n  width: 100vw;\n  height: 100vh;\n  overflow-x: hidden;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  padding: 2rem 0;\n  gap: 3rem;\n  color: var(--light-blue);\n  transform: scale(1);\n  transition: transform 300ms ease-in-out;\n}\nsection.ships-input-container.hide {\n  display: none;\n}\n\n.btn {\n  background: var(--light-blue);\n  border-radius: 0.7rem;\n  font-weight: bold;\n  cursor: pointer;\n}\n.btn:hover {\n  transform: scale(1.05);\n  transition: transform 150ms ease-in-out;\n}\nbutton.rotate-ship {\n  padding: 0.4rem 15rem;\n  font-size: 2.5rem;\n  position: relative;\n}\np.sticky-rotate {\n  position: absolute;\n  left: 2rem;\n  top: 50%;\n  transform: translate(0, -50%);\n  background: var(--medium-blue);\n  font-size: 1.5rem;\n  padding: 0.2rem 1.5rem;\n  border-radius: 1rem;\n}\nmain.ships-input-grid {\n  display: grid;\n  grid-template: repeat(10, 1fr) / repeat(10, 1fr);\n  width: 30rem;\n  height: 30rem;\n  gap: 2px;\n}\nmain.ships-input-grid > .grid-coordinate {\n  background-color: var(--light-blue);\n  border-radius: 0.3rem;\n}\nmain.ships-input-grid > .grid-coordinate.hover {\n  background-color: var(--medium-blue);\n}\nmain.ships-input-grid > .grid-coordinate.ship {\n  background-color: var(--ship-color);\n}\nmain.ships-input-grid > .grid-coordinate.invalid {\n  cursor: not-allowed;\n}\nmain.ships-input-grid > .grid-coordinate.hit {\n  background-color: var(--hit-color);\n}\nmain.ships-input-grid > .grid-coordinate.miss {\n  background-color: var(--miss-color);\n}\n\nmain.ships-input-grid.gameon {\n  transform: scale(0.8);\n  transition: transform 0.5s ease-in-out;\n}\nmain.ships-input-grid.enemy-grid {\n  position: relative;\n  transform: translateX(0);\n  transition: transform 1s ease, width 300ms ease;\n}\nmain.ships-input-grid.enemy-grid.hide {\n  width: 0;\n  transform: translateX(40rem);\n}\nbutton.game-start {\n  padding: 0.3rem 2rem;\n  font-size: 2rem;\n  position: absolute;\n  right: 3rem;\n  bottom: 3rem;\n  width: auto;\n  display: inline-flex;\n  justify-content: center;\n  align-items: center;\n  transition: right 300ms ease-in-out;\n}\n\nbutton.game-start.hide {\n  /* transform: scale(0); */\n  right: -11rem;\n}\n.grids-container {\n  display: flex;\n  gap: 2rem;\n  position: relative;\n  transform: translateY(0);\n  opacity: 1;\n  transition: transform 0.5s ease-in-out 0.4s, opacity 0.6s ease-in-out 0.4s;\n}\n.grids-container.hide {\n  transform: translateY(15rem);\n  opacity: 0;\n}\n\n@media (max-width: 1050px) {\n  main.ships-input-grid.player-grid.gameon,\n  main.ships-input-grid.enemy-grid {\n    width: 24rem;\n    height: 24rem;\n  }\n  .gameover-box {\n    width: auto;\n  }\n}\n@media (max-width: 870px) {\n  main.ships-input-grid.player-grid.gameon,\n  main.ships-input-grid.enemy-grid {\n    width: 20rem;\n    height: 20rem;\n  }\n\n  main.ships-input-grid {\n    gap: 1px;\n  }\n}\n@media (max-width: 750px) {\n  .grids-container {\n    flex-direction: column;\n  }\n}\n@media (max-width: 650px) {\n  main.ships-input-grid.player-grid {\n    width: 24rem;\n    height: 24rem;\n  }\n  button.rotate-ship {\n    padding: 0.4rem 10rem;\n    font-size: 1.5rem;\n  }\n  header.ships-input-prompt {\n    font-size: 2.5rem;\n  }\n  p.sticky-rotate {\n    font-size: 1rem;\n    padding: 0.2rem 1rem;\n  }\n  header.header-name {\n    font-size: 5rem;\n  }\n  input#playerName {\n    width: 22rem;\n  }\n  button.game-start {\n    padding: 0.3rem 1rem;\n    font-size: 1.5rem;\n    right: 2rem;\n    bottom: 2rem;\n    border-radius: 1rem;\n  }\n}\n@media (max-width: 470px){\n  .gameover-box {\n    width: auto;\n    padding: 2rem;\n  }\n  .gameover-box h1{\n\n  }\n  .gameover-box h1 {\n    font-size: 1.5rem;\n    padding-bottom: 2rem;\n}\n}\n@media (max-width: 390px) {\n  button.rotate-ship {\n    padding: 0.4rem 6rem;\n    font-size: 1rem;\n  }\n  header.ships-input-prompt {\n    font-size: 2rem;\n  }\n  input#playerName {\n    width: 17rem;\n  }\n  main.ships-input-grid.player-grid,\n  main.ships-input-grid.enemy-grid {\n    width: 19rem;\n    height: 19rem;\n  }\n  button.rotate-ship {\n    padding: 0.4rem 7rem;\n    font-size: 1.5rem;\n  }\n  p.sticky-rotate {\n    font-size: 0.5rem;\n    padding: 0.2rem 0.5rem;\n  }\n  .rotate-ship.btn {\n    padding: 0.4rem 7rem;\n  }\n  header.header-name {\n    font-size: 3rem;\n  }\n  /*  button.game-start {\n    padding: 0.3rem 1rem;\n    font-size: 1.5rem;\n    right: 2rem;\n    bottom: 2rem;\n    border-radius: 1rem;\n  } */\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1577,21 +1837,32 @@ __webpack_require__.r(__webpack_exports__);
 
 
 (0,_scripts_dom_addEventListners__WEBPACK_IMPORTED_MODULE_5__.addAllEventListeners)();
-
-/* document.querySelector('section.introduction-container button.proceed').addEventListener('click', () => {
-    hide('introduction-container');
-    show('shipdropping');
-    show('grids-container');
-}) */
-
-let player1 = (0,_scripts_player_human__WEBPACK_IMPORTED_MODULE_1__.human)("anas");
+let backgroundSong = new Audio("./assets/sounds/background_song.mp3");
+let player1Name;
+document.querySelector("form.introduction-container").addEventListener("submit", e => {
+  e.preventDefault();
+  backgroundSong.play();
+  player1Name = document.getElementById("playerName").value;
+  (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_7__.hide)("introduction-container");
+  (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_7__.show)("ships-input-container");
+  (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_7__.show)("shipdropping");
+  (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_7__.show)("grids-container");
+});
+backgroundSong.addEventListener("ended", () => {
+  backgroundSong.currentTime = 0;
+  backgroundSong.play();
+});
+let player1 = (0,_scripts_player_human__WEBPACK_IMPORTED_MODULE_1__.human)(player1Name);
 let player2 = (0,_scripts_player_ai__WEBPACK_IMPORTED_MODULE_0__.ai)();
-let player1tempGrid = (0,_scripts_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_4__.createGrid)(100, player1.board);
-player2.dropRandomShips([0, 0, 1, 2, 1, 1]);
-let player2Grid = player1tempGrid.cloneNode(true);
-player2Grid.classList.add("enemy-grid", "hide");
-document.querySelector(".grids-container").appendChild(player2Grid);
+const gridsContainer = document.querySelector('.grids-container');
+let player1tempGrid = (0,_scripts_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_4__.createGrid)(100, player1.board, ['player-grid']);
+console.log(player1tempGrid);
+gridsContainer.appendChild(player1tempGrid);
+let player2Grid = (0,_scripts_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_4__.createEmptyGrid)(["ships-input-grid", "enemy-grid", "hide"], 'grid-coordinate');
+gridsContainer.appendChild(player2Grid);
+console.log(player1tempGrid.childNodes);
 (0,_scripts_dom_startTheGame__WEBPACK_IMPORTED_MODULE_6__.startTheGame)().then(player1Grid => {
+  player2.dropRandomShips([0, 0, 1, 2, 1, 1]);
   let newGame = (0,_scripts_game__WEBPACK_IMPORTED_MODULE_2__.game)(player1, player2Grid, player2, player1Grid);
   newGame.startGame(newGame);
 });
@@ -1599,4 +1870,4 @@ document.querySelector(".grids-container").appendChild(player2Grid);
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.8d5fd6b88dba1fce0336.js.map
+//# sourceMappingURL=bundle.f37914e880a27592de4c.js.map
