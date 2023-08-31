@@ -2,6 +2,20 @@ import { selectShips } from "./input-ships";
 import { ship } from "../ship";
 import { point } from "../point";
 import { show, hide } from "./popup";
+
+const createEmptyGrid = (classList, componentClassName) => {
+  const newGrid = document.createElement("main");
+  classList.forEach(className => newGrid.classList.add(className));
+  let i = 0;
+  while(i < 100){
+    const component = document.createElement("div");
+    component.setAttribute('key', i);
+    component.className = componentClassName;
+    newGrid.appendChild(component);
+    i++;
+  }
+  return newGrid;
+}
 const createCoordinate = (key, playerBoard, shipsInput) => {
   let shipCoordinate = point(parseInt(key / 10), parseInt(key % 10));
   const coordinate = document.createElement("div");
@@ -82,8 +96,14 @@ const getShipsCoordinates = (key, alignment, selectedShip) => {
   return arr;
 };
 
-const createGrid = (size, playerGameBoard) => {
-  const shipsGridContainer = document.querySelector(".ships-input-grid");
+const createGrid = (size, playerGameBoard, classList) => {
+  const shipsGridContainer = document.createElement('main');
+  shipsGridContainer.classList.add("ships-input-grid")
+  if(classList){
+    classList.forEach(className => {
+      shipsGridContainer.classList.add(className);
+    })
+  }
   let shipsInput = selectShips();
   for (let i = 0; i < size; i++) {
     shipsGridContainer.appendChild(
@@ -96,4 +116,4 @@ const getCurrentAlignment = () => {
   const rotateShipBtn = document.querySelector(".rotate-ship");
   return rotateShipBtn.getAttribute("value");
 };
-export { createGrid };
+export { createGrid, createEmptyGrid };

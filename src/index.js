@@ -2,7 +2,7 @@ import { ai } from "./scripts/player-ai";
 import { human } from "./scripts/player-human";
 import { game } from "./scripts/game";
 import "./styles/game.css";
-import { createGrid } from "./scripts/dom/createPlayerGrid";
+import { createGrid, createEmptyGrid } from "./scripts/dom/createPlayerGrid";
 import { addAllEventListeners } from "./scripts/dom/addEventListners";
 import { startTheGame } from "./scripts/dom/startTheGame";
 import { show, hide } from "./scripts/dom/popup";
@@ -29,13 +29,16 @@ backgroundSong.addEventListener("ended", () => {
 
 let player1 = human(player1Name);
 let player2 = ai();
-let player1tempGrid = createGrid(100, player1.board);
-player2.dropRandomShips([0, 0, 1, 2, 1, 1]);
-let player2Grid = player1tempGrid.cloneNode(true);
-player2Grid.classList.add("enemy-grid", "hide");
-document.querySelector(".grids-container").appendChild(player2Grid);
+const gridsContainer = document.querySelector('.grids-container');
+let player1tempGrid = createGrid(100, player1.board, ['player-grid']);
+console.log(player1tempGrid)
+gridsContainer.appendChild(player1tempGrid);
+let player2Grid = createEmptyGrid(["ships-input-grid", "enemy-grid", "hide"],'grid-coordinate')
+gridsContainer.appendChild(player2Grid);
+console.log(player1tempGrid.childNodes)
 
 startTheGame().then((player1Grid) => {
+  player2.dropRandomShips([0, 0, 1, 2, 1, 1]);
   let newGame = game(player1, player2Grid, player2, player1Grid);
   newGame.startGame(newGame);
 });
