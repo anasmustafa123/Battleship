@@ -17,6 +17,7 @@
 }
 body {
   background-color: var(--dark-blue);
+  font-size: 100%;
 }
 
 form.introduction-container {
@@ -93,7 +94,8 @@ header.header-name {
   font-weight: bold;
   height: 8rem;
   transform: translateX(0);
-  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, height 0.5s ease-in-out ;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out,
+    height 0.5s ease-in-out;
 }
 .shipdropping {
   text-align: center;
@@ -102,7 +104,8 @@ header.header-name {
   gap: 4rem;
   height: 14rem;
   transform: translateX(0);
-  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, height 0.5s ease-in-out ;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out,
+    height 0.5s ease-in-out;
 }
 .shipdropping.hide {
   opacity: 0;
@@ -148,7 +151,7 @@ header.ships-input-prompt[name="Destroyer"]::after {
 section.ships-input-container {
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -222,21 +225,22 @@ main.ships-input-grid.gameon {
 main.ships-input-grid.enemy-grid {
   position: relative;
   transform: translateX(0);
-  width: 30rem;
   transition: transform 1s ease, width 300ms ease;
 }
 main.ships-input-grid.enemy-grid.hide {
   width: 0;
-  transform: translateX(40rem)
+  transform: translateX(40rem);
 }
 button.game-start {
-  padding: 0.3rem 3rem;
+  padding: 0.3rem 2rem;
   font-size: 2rem;
   position: absolute;
   right: 3rem;
   bottom: 3rem;
-  /* transform: scale(1); */
   width: auto;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   transition: right 300ms ease-in-out;
 }
 
@@ -250,9 +254,102 @@ button.game-start.hide {
   position: relative;
   transform: translateY(0);
   opacity: 1;
-  transition: transform 0.5s ease-in-out 0.4s,opacity 0.6s ease-in-out 0.4s;
+  transition: transform 0.5s ease-in-out 0.4s, opacity 0.6s ease-in-out 0.4s;
 }
 .grids-container.hide {
   transform: translateY(15rem);
   opacity: 0;
+}
+
+@media (max-width: 1050px) {
+  main.ships-input-grid.player-grid.gameon,
+  main.ships-input-grid.enemy-grid {
+    width: 24rem;
+    height: 24rem;
+  }
+}
+@media (max-width: 870px) {
+  main.ships-input-grid.player-grid.gameon,
+  main.ships-input-grid.enemy-grid {
+    width: 20rem;
+    height: 20rem;
+  }
+
+  main.ships-input-grid {
+    gap: 1px;
+  }
+}
+@media (max-width: 750px) {
+  .grids-container {
+    flex-direction: column;
+  }
+}
+@media (max-width: 650px) {
+  main.ships-input-grid.player-grid {
+    width: 24rem;
+    height: 24rem;
+  }
+  button.rotate-ship {
+    padding: 0.4rem 10rem;
+    font-size: 1.5rem;
+  }
+  header.ships-input-prompt {
+    font-size: 2.5rem;
+  }
+  p.sticky-rotate {
+    font-size: 1rem;
+    padding: 0.2rem 1rem;
+  }
+  header.header-name {
+    font-size: 5rem;
+  }
+  input#playerName {
+    width: 22rem;
+  }
+  button.game-start {
+    padding: 0.3rem 1rem;
+    font-size: 1.5rem;
+    right: 2rem;
+    bottom: 2rem;
+    border-radius: 1rem;
+  }
+}
+
+@media (max-width: 390px) {
+  button.rotate-ship {
+    padding: 0.4rem 6rem;
+    font-size: 1rem;
+  }
+  header.ships-input-prompt {
+    font-size: 2rem;
+  }
+  input#playerName {
+    width: 17rem;
+  }
+  main.ships-input-grid.player-grid,
+  main.ships-input-grid.enemy-grid {
+    width: 19rem;
+    height: 19rem;
+  }
+  button.rotate-ship {
+    padding: 0.4rem 7rem;
+    font-size: 1.5rem;
+  }
+  p.sticky-rotate {
+    font-size: 0.5rem;
+    padding: 0.2rem 0.5rem;
+  }
+  .rotate-ship.btn {
+    padding: 0.4rem 7rem;
+  }
+  header.header-name {
+    font-size: 3rem;
+  }
+  /*  button.game-start {
+    padding: 0.3rem 1rem;
+    font-size: 1.5rem;
+    right: 2rem;
+    bottom: 2rem;
+    border-radius: 1rem;
+  } */
 }
