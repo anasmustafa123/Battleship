@@ -267,6 +267,9 @@ button.game-start.hide {
     width: 24rem;
     height: 24rem;
   }
+  .gameover-box {
+    width: auto;
+  }
 }
 @media (max-width: 870px) {
   main.ships-input-grid.player-grid.gameon,
@@ -314,7 +317,19 @@ button.game-start.hide {
     border-radius: 1rem;
   }
 }
+@media (max-width: 470px){
+  .gameover-box {
+    width: auto;
+    padding: 2rem;
+  }
+  .gameover-box h1{
 
+  }
+  .gameover-box h1 {
+    font-size: 1.5rem;
+    padding-bottom: 2rem;
+}
+}
 @media (max-width: 390px) {
   button.rotate-ship {
     padding: 0.4rem 6rem;
