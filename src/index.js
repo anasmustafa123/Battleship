@@ -14,7 +14,7 @@ let player1Name;
 document
   .querySelector("form.introduction-container")
   .addEventListener("submit", (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     backgroundSong.play();
     player1Name = document.getElementById("playerName").value;
     hide("introduction-container");
