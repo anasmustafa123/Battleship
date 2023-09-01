@@ -37,8 +37,15 @@ let player2Grid = createEmptyGrid(["ships-input-grid", "enemy-grid", "hide"],'gr
 gridsContainer.appendChild(player2Grid);
 console.log(player1tempGrid.childNodes)
 
-startTheGame().then((player1Grid) => {
+
+let startBtn = document.querySelector("button.game-start");
+startBtn.addEventListener("click", () => {
   player2.dropRandomShips([0, 0, 1, 2, 1, 1]);
-  let newGame = game(player1, player2Grid, player2, player1Grid);
+  let player1Grid = startTheGame();
+  let player1Gridx = document.querySelector('.ships-input-grid.player-grid');
+  let player2Gridx = document.querySelector('.ships-input-grid.enemy-grid');
+  console.log(player2Gridx)
+  console.log(player1Gridx)
+  let newGame = game(player1, player2Gridx, player2, player1Grid);
   newGame.startGame(newGame);
-});
+})

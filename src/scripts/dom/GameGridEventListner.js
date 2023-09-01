@@ -2,6 +2,7 @@ import { point } from "../point";
 let hitSound = new Audio("../../assets/sounds/sank.mp3");
 let missSound = new Audio("../../assets/sounds/miss.wav");
 const gridEventListner = (playerGrid, checker, continutheGame) => {
+  console.log(playerGrid)
   playerGrid.querySelectorAll(".grid-coordinate").forEach((element) => {
     element.addEventListener("click", () => {
       let key = parseInt(element.getAttribute("key"));

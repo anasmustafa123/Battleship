@@ -9,7 +9,7 @@ const human = (name) => {
   const enemyAttack = (attackPoint) => {
     let result = proto.board.receiveAttack(attackPoint);
     return result;
-  };
+  }; 
   const isLost = () => {
     return proto.board.isAllSank();
   };
