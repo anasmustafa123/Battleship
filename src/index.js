@@ -9,7 +9,7 @@ import { show, hide } from "./scripts/dom/popup";
 
 addAllEventListeners();
 let backgroundSong = new Audio("./assets/sounds/background_song.mp3");
-
+backgroundSong.volume=0.4; 
 let player1Name;
 document
   .querySelector("form.introduction-container")
