@@ -1,6 +1,6 @@
 import { point } from "../point";
-let hitSound = new Audio("../../assets/sounds/sank.mp3");
-let missSound = new Audio("../../assets/sounds/miss.wav");
+let hitSound = new Audio("assets/sounds/sank.mp3");
+let missSound = new Audio("assets/sounds/miss.wav");
 const gridEventListner = (playerGrid, checker, continutheGame) => {
   console.log(playerGrid)
   playerGrid.querySelectorAll(".grid-coordinate").forEach((element) => {
@@ -12,7 +12,7 @@ const gridEventListner = (playerGrid, checker, continutheGame) => {
         styleTheResult(element, result);
         makeAttackSound(result);
         continutheGame();
-      }
+      } 
     });
   });
 };

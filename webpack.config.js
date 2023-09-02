@@ -3,7 +3,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BundleAnalyzerPlugin =
   require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-  
+
 /* used to copy data from file to dist */
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
@@ -70,6 +70,18 @@ module.exports = {
           },
         },
       },
+      /* {
+        test: /\.(wav|mp3|ogg|flac)/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "[name].[ext]",
+              outputPath: "sounds/" 
+            }
+          }
+        ],
+      }, */
     ],
   },
 

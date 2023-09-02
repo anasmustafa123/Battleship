@@ -15,8 +15,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _point__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../point */ "./src/scripts/point.js");
 
-let hitSound = new Audio("../../assets/sounds/sank.mp3");
-let missSound = new Audio("../../assets/sounds/miss.wav");
+let hitSound = new Audio("assets/sounds/sank.mp3");
+let missSound = new Audio("assets/sounds/miss.wav");
 const gridEventListner = (playerGrid, checker, continutheGame) => {
   console.log(playerGrid);
   playerGrid.querySelectorAll(".grid-coordinate").forEach(element => {
@@ -526,30 +526,73 @@ __webpack_require__.r(__webpack_exports__);
 
 const nearestPoints = () => {
   let heap = [];
-  let tempHeap = [];
+  let lastPoint = (0,_point__WEBPACK_IMPORTED_MODULE_0__.point)(-1, -1);
+  let guessedAlignment = null;
   const isExist = (point, pointsArr) => {
     return pointsArr.find(element => element == point);
   };
   const addAdjacentPoints = (thePoint, pointsArr) => {
     let newPoints = [thePoint + 1, thePoint + 10, thePoint - 1, thePoint - 10];
+    let count = 0;
     newPoints.forEach(newPoint => {
-      console.log(isExist(newPoint, pointsArr));
       if (newPoint < 100 && newPoint > 0 && isExist(newPoint, pointsArr)) {
         heap.push(newPoint);
+        count++;
       }
     });
+    return count;
   };
-  const getLastPoint = () => heap.splice(heap.length - 1, 1);
-  const clearAll = () => {
-    heap.splice(0, heap.length);
+  const getLastPoint = goodMovesCount => {
+    console.log(heap);
+    if (goodMovesCount == 0 || guessedAlignment == null) return heap.splice(heap.length - 1, 1);
+    for (let i = heap.length - 1; i > heap.length - goodMovesCount - 1; i--) {
+      if (guessedAlignment == "h") {
+        if (parseInt(heap[i] / 10) == lastPoint.x) {
+          let lastHitPoint = heap.splice(i, 1);
+          return lastHitPoint;
+        }
+      } else if (guessedAlignment == "v") {
+        if (parseInt(heap[i] % 10) == lastPoint.y) {
+          let lastHitPoint = heap.splice(i, 1);
+          return lastHitPoint;
+        }
+      }
+    }
+    popAll(goodMovesCount);
+    return null;
+  };
+  const popAll = len => {
+    heap.splice(heap.length - len - 1, len);
+  };
+  const clearRedundant = (lastHitPoint, goodMovesCount) => {
+    console.log(heap, length);
+    console.log(lastPoint);
+    console.log(lastHitPoint);
+    if (lastHitPoint.x == lastPoint.x) guessedAlignment = "h";else if (lastHitPoint.y == lastPoint.y) guessedAlignment = "v";else guessedAlignment = null;
+    lastPoint = lastHitPoint;
+    console.log(guessedAlignment);
+    console.log(heap.length - goodMovesCount);
+    for (let i = heap.length - 1; i > heap.length - goodMovesCount - 1; i--) {
+      if (guessedAlignment == "h" && parseInt(heap[i] / 10) != lastHitPoint.x) {
+        console.log(`horizontal and removed:  ${heap[i]}`);
+        heap[i] = -1;
+      } else if (guessedAlignment == "v" && parseInt(heap[i] % 10) != lastHitPoint.y) {
+        console.log(`vertical and removed:  ${heap[i]}`);
+        heap[i] = -1;
+      }
+    }
+    heap = heap.filter(value => {
+      return value != -1;
+    });
   };
   const isEmpty = () => heap.length == 0;
   return {
     isExist,
     addAdjacentPoints,
     getLastPoint,
-    clearAll,
-    isEmpty
+    popAll,
+    isEmpty,
+    clearRedundant
   };
 };
 
@@ -580,6 +623,7 @@ const ai = () => {
   let currentGame;
   let grid;
   let possiblePoints;
+  let goodMovesCount = 0;
   const fillArray = len => {
     let pointsArr = [];
     for (let i = 0; i < len; i++) {
@@ -600,42 +644,37 @@ const ai = () => {
   };
   const coordinateToPoint = coordinate => (0,_point__WEBPACK_IMPORTED_MODULE_1__.point)(parseInt(coordinate / 10), parseInt(coordinate % 10));
   const requestAnAttack = () => {
+    console.log(goodMovesCount);
     let randomPoint;
-    console.log("randomPoint");
     if (possiblePoints.isEmpty()) {
-      console.log("------> empty");
       randomPoint = ChooseRandomAttackPoint();
     } else {
-      console.log("------> not empty");
-      let randomCoordinate = possiblePoints.getLastPoint();
-      console.log({
-        randomCoordinate
-      });
-      randomPoint = coordinateToPoint(randomCoordinate);
-      console.log({
-        randomPoint
-      });
+      let randomCoordinate = possiblePoints.getLastPoint(goodMovesCount);
+      if (randomCoordinate == null) {
+        randomPoint = ChooseRandomAttackPoint();
+        console.log('no valid moves found');
+        goodMovesCount = 0;
+      } else {
+        goodMovesCount--;
+        randomPoint = coordinateToPoint(randomCoordinate);
+      }
     }
     lastResult = gameEnemy.enemyAttack(randomPoint);
-    if (lastResult) {
-      console.log("started");
-      /* possiblePoints.clearAll();  */
-      possiblePoints.addAdjacentPoints(randomPoint.x * 10 + randomPoint.y, pointsArr);
-      let queryValue = randomPoint.x * 10 + randomPoint.y;
-      pointsArr = pointsArr.filter(value => {
-        return value != queryValue;
-      });
-    }
     while (lastResult === null) {
       randomPoint = ChooseRandomAttackPoint();
       lastResult = gameEnemy.enemyAttack(randomPoint);
     }
-
-    /* let randomPoint = ChooseRandomAttackPoint();
-    lastResult = gameEnemy.enemyAttack(randomPoint); 
-    while(lastResult === null){
-      randomPoint = ChooseRandomAttackPoint();
-      lastResult = gameEnemy.enemyAttack(randomPoint);*/
+    if (lastResult) {
+      console.log('hit');
+      possiblePoints.clearRedundant(randomPoint, goodMovesCount);
+      goodMovesCount = possiblePoints.addAdjacentPoints(randomPoint.x * 10 + randomPoint.y, pointsArr);
+      let queryValue = randomPoint.x * 10 + randomPoint.y;
+      pointsArr = pointsArr.filter(value => {
+        return value != queryValue;
+      });
+    } else {
+      goodMovesCount = goodMovesCount > 0 ? goodMovesCount - 1 : goodMovesCount;
+    }
     if (grid) {
       (0,_dom_GameGridEventListner__WEBPACK_IMPORTED_MODULE_2__.styleElement)(grid, randomPoint, lastResult);
     }
@@ -1874,4 +1913,4 @@ startBtn.addEventListener("click", () => {
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.511fa25651a2511455f3.js.map
+//# sourceMappingURL=bundle.3f0b99aade238c0e7f6f.js.map
