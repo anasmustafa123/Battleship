@@ -1,4 +1,4 @@
-<img src= "assets/BattleShip-readme.png" alt= "game sample img">
+<img src= "/src/assets/BattleShip-readme.png" alt= "game sample img">
 
 # BattleShip Game
 implementation of the famous battleship game
