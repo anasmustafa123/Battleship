@@ -5,4 +5,4 @@ const hide = (className) => {
   document.querySelector(`.${className}`).classList.add("hide");
 };
 
-export {show, hide};
+export { show, hide };

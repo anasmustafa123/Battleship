@@ -9,12 +9,12 @@ import { show, hide } from "./scripts/dom/popup";
 
 addAllEventListeners();
 let backgroundSong = new Audio("./assets/sounds/background_song.mp3");
-backgroundSong.volume=0.4; 
+backgroundSong.volume = 0.4;
 let player1Name;
 document
   .querySelector("form.introduction-container")
   .addEventListener("submit", (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     backgroundSong.play();
     player1Name = document.getElementById("playerName").value;
     hide("introduction-container");
@@ -29,23 +29,20 @@ backgroundSong.addEventListener("ended", () => {
 
 let player1 = human(player1Name);
 let player2 = ai();
-const gridsContainer = document.querySelector('.grids-container');
-let player1tempGrid = createGrid(100, player1.board, ['player-grid']);
-console.log(player1tempGrid)
+const gridsContainer = document.querySelector(".grids-container");
+let player1tempGrid = createGrid(100, player1.board, ["player-grid"]);
 gridsContainer.appendChild(player1tempGrid);
-let player2Grid = createEmptyGrid(["ships-input-grid", "enemy-grid", "hide"],'grid-coordinate')
+let player2Grid = createEmptyGrid(
+  ["ships-input-grid", "enemy-grid", "hide"],
+  "grid-coordinate"
+);
 gridsContainer.appendChild(player2Grid);
-console.log(player1tempGrid.childNodes)
-
 
 let startBtn = document.querySelector("button.game-start");
 startBtn.addEventListener("click", () => {
   player2.dropRandomShips([0, 0, 1, 2, 1, 1]);
   let player1Grid = startTheGame();
-  let player1Gridx = document.querySelector('.ships-input-grid.player-grid');
-  let player2Gridx = document.querySelector('.ships-input-grid.enemy-grid');
-  console.log(player2Gridx)
-  console.log(player1Gridx)
+  let player2Gridx = document.querySelector(".ships-input-grid.enemy-grid");
   let newGame = game(player1, player2Gridx, player2, player1Grid);
   newGame.startGame(newGame);
-})
+});

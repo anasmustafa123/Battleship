@@ -55,15 +55,14 @@ const game = (p1, pl1Grid, p2, pl2Grid) => {
     player2OldGrid.parentNode.replaceChild(player2NewGrid, player2OldGrid);
     const newplayerGrid = createGrid(100, player1.board, ["player-grid"]);
     player1Grid.parentNode.replaceChild(newplayerGrid, player1Grid);
-      let player1Gridx = document.querySelector('.ships-input-grid.player-grid');
-  let player2Gridx = document.querySelector('.ships-input-grid.enemy-grid');
-    console.log(player2Gridx)
-    console.log(player1Gridx)
+    let player1Gridx = document.querySelector(".ships-input-grid.player-grid");
+    let player2Gridx = document.querySelector(".ships-input-grid.enemy-grid");
+    console.log(player2Gridx);
+    console.log(player1Gridx);
     hide("gameover");
     hide("ships-input-grid.enemy-grid");
     hide("header-name");
     show("shipdropping");
-    
   });
   return { continueGame, startGame };
 };

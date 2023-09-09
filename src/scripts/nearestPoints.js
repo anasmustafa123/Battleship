@@ -19,8 +19,8 @@ const nearestPoints = () => {
     return count;
   };
   const getLastPoint = (goodMovesCount) => {
-    console.log(heap)
-    if(goodMovesCount == 0 || guessedAlignment == null) return heap.splice(heap.length-1, 1);
+    if (goodMovesCount == 0 || guessedAlignment == null)
+      return heap.splice(heap.length - 1, 1);
     for (let i = heap.length - 1; i > heap.length - goodMovesCount - 1; i--) {
       if (guessedAlignment == "h") {
         if (parseInt(heap[i] / 10) == lastPoint.x) {
@@ -28,7 +28,7 @@ const nearestPoints = () => {
           return lastHitPoint;
         }
       } else if (guessedAlignment == "v") {
-        if (parseInt(heap[i] % 10) == lastPoint.y){ 
+        if (parseInt(heap[i] % 10) == lastPoint.y) {
           let lastHitPoint = heap.splice(i, 1);
           return lastHitPoint;
         }
@@ -41,24 +41,17 @@ const nearestPoints = () => {
     heap.splice(heap.length - len - 1, len);
   };
   const clearRedundant = (lastHitPoint, goodMovesCount) => {
-    console.log(heap, length);
-    console.log(lastPoint);
-    console.log(lastHitPoint);
     if (lastHitPoint.x == lastPoint.x) guessedAlignment = "h";
     else if (lastHitPoint.y == lastPoint.y) guessedAlignment = "v";
     else guessedAlignment = null;
     lastPoint = lastHitPoint;
-    console.log(guessedAlignment);
-    console.log(heap.length - goodMovesCount);
     for (let i = heap.length - 1; i > heap.length - goodMovesCount - 1; i--) {
       if (guessedAlignment == "h" && parseInt(heap[i] / 10) != lastHitPoint.x) {
-        console.log(`horizontal and removed:  ${heap[i]}`);
         heap[i] = -1;
       } else if (
         guessedAlignment == "v" &&
         parseInt(heap[i] % 10) != lastHitPoint.y
       ) {
-        console.log(`vertical and removed:  ${heap[i]}`);
         heap[i] = -1;
       }
     }

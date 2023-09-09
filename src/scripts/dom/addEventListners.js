@@ -18,14 +18,16 @@ const addAllEventListeners = () => {
   let startBtn = document.querySelector("button.game-start");
   startBtn.addEventListener("click", () => {
     hide("game-start");
-    const targetObject = document.querySelector(".grids-container").firstElementChild;
-    console.log(targetObject)
+    const targetObject =
+      document.querySelector(".grids-container").firstElementChild;
+    console.log(targetObject);
     const clonedObject = targetObject.cloneNode(true);
-    console.log(clonedObject)
+    console.log(clonedObject);
     targetObject.parentNode.replaceChild(clonedObject, targetObject);
     show("enemy-grid");
-    let player1Grid = document.querySelector(".grids-container").firstElementChild;
-    console.log(player1Grid)
+    let player1Grid =
+      document.querySelector(".grids-container").firstElementChild;
+    console.log(player1Grid);
     player1Grid.classList.add("gameon");
   });
 };

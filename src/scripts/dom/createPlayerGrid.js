@@ -5,17 +5,17 @@ import { show, hide } from "./popup";
 
 const createEmptyGrid = (classList, componentClassName) => {
   const newGrid = document.createElement("main");
-  classList.forEach(className => newGrid.classList.add(className));
+  classList.forEach((className) => newGrid.classList.add(className));
   let i = 0;
-  while(i < 100){
+  while (i < 100) {
     const component = document.createElement("div");
-    component.setAttribute('key', i);
+    component.setAttribute("key", i);
     component.className = componentClassName;
     newGrid.appendChild(component);
     i++;
   }
   return newGrid;
-}
+};
 const createCoordinate = (key, playerBoard, shipsInput) => {
   let shipCoordinate = point(parseInt(key / 10), parseInt(key % 10));
   const coordinate = document.createElement("div");
@@ -49,10 +49,12 @@ const createCoordinate = (key, playerBoard, shipsInput) => {
     if (dropTheShip(playerBoard, shipLength, shipCoordinate, alignment)) {
       addClassNameToTheShip("ship", key, alignment, shipLength);
       shipsInput.updateSelectedShip();
-      document.querySelector('.ships-input-prompt').setAttribute("name", `${shipsInput.getShipName()}`)
-      if(shipsInput.isOutOfShips()){
-        hide('shipdropping');
-        show('header-name');
+      document
+        .querySelector(".ships-input-prompt")
+        .setAttribute("name", `${shipsInput.getShipName()}`);
+      if (shipsInput.isOutOfShips()) {
+        hide("shipdropping");
+        show("header-name");
         show("game-start");
       }
     }
@@ -97,12 +99,12 @@ const getShipsCoordinates = (key, alignment, selectedShip) => {
 };
 
 const createGrid = (size, playerGameBoard, classList) => {
-  const shipsGridContainer = document.createElement('main');
-  shipsGridContainer.classList.add("ships-input-grid")
-  if(classList){
-    classList.forEach(className => {
+  const shipsGridContainer = document.createElement("main");
+  shipsGridContainer.classList.add("ships-input-grid");
+  if (classList) {
+    classList.forEach((className) => {
       shipsGridContainer.classList.add(className);
-    })
+    });
   }
   let shipsInput = selectShips();
   for (let i = 0; i < size; i++) {

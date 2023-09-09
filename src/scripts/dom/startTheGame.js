@@ -8,7 +8,6 @@ const startTheGame = () => {
   show("enemy-grid");
   let player1Grid =
     document.querySelector(".grids-container").firstElementChild;
-  console.log(player1Grid);
   player1Grid.classList.add("gameon");
   return player1Grid;
 };

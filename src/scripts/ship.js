@@ -4,9 +4,9 @@ const ship = (length, sPoint, alignment) => {
   let grid = Array(length).fill(0);
   const getHitCount = () => hitCount;
   const distance = (hitPoint) => {
-    return (hitPoint.x - sPoint.x) + (hitPoint.y - sPoint.y);
+    return hitPoint.x - sPoint.x + (hitPoint.y - sPoint.y);
   };
-  const isHit = (hitPoint) => { 
+  const isHit = (hitPoint) => {
     let pointDistance = distance(hitPoint);
     if (grid[pointDistance] == 1) returnValue = null;
     else {
@@ -18,14 +18,15 @@ const ship = (length, sPoint, alignment) => {
         if (hitPoint.y != sPoint.y) returnValue = false;
         else valid = true;
       }
-      if (pointDistance >= 0 && pointDistance < length && valid ) {
+      if (pointDistance >= 0 && pointDistance < length && valid) {
         returnValue = true;
       } else {
-        returnValue = false;}
+        returnValue = false;
+      }
     }
     if (returnValue) {
       grid[pointDistance] = 1;
-      hitCount+=1;
+      hitCount += 1;
     }
     return returnValue;
   };

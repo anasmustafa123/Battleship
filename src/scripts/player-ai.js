@@ -19,13 +19,15 @@ const ai = () => {
   let pointsArr = fillArray(100);
   let proto = Object.create(player("ai"));
   const ChooseRandomAttackPoint = () => {
-    let query = parseInt(Math.random() * (pointsArr.length));
+    let query = parseInt(Math.random() * pointsArr.length);
     let queryValue = pointsArr[query];
     let queryPoint = coordinateToPoint(queryValue);
     pointsArr = pointsArr.filter((value) => {
       return value != queryValue;
     });
-    console.log(`random point: ${queryPoint.x}, ${queryPoint.y} queryValue: ${queryValue}`);
+    console.log(
+      `random point: ${queryPoint.x}, ${queryPoint.y} queryValue: ${queryValue}`
+    );
     return queryPoint;
   };
   const coordinateToPoint = (coordinate) =>
@@ -36,11 +38,11 @@ const ai = () => {
       randomPoint = ChooseRandomAttackPoint();
     } else {
       let randomCoordinate = possiblePoints.getLastPoint(goodMovesCount);
-      if(randomCoordinate == null){
+      if (randomCoordinate == null) {
         randomPoint = ChooseRandomAttackPoint();
         goodMovesCount = 0;
-      }else {
-         goodMovesCount--; 
+      } else {
+        goodMovesCount--;
         randomPoint = coordinateToPoint(randomCoordinate);
       }
     }
@@ -73,7 +75,7 @@ const ai = () => {
     goodMovesCount = 0;
     pointsArr = fillArray(100);
     proto.board.clearBoard();
-  }
+  };
   const enemyAttack = (attackPoint) => {
     let result = proto.board.receiveAttack(attackPoint);
     return result;
@@ -95,7 +97,7 @@ const ai = () => {
     enemyAttack,
     isLost,
     setGame,
-    restart
+    restart,
   });
 };
 export { ai };
