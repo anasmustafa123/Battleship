@@ -18,7 +18,6 @@ __webpack_require__.r(__webpack_exports__);
 let hitSound = new Audio("assets/sounds/sank.mp3");
 let missSound = new Audio("assets/sounds/miss.wav");
 const gridEventListner = (playerGrid, checker, continutheGame) => {
-  console.log(playerGrid);
   playerGrid.querySelectorAll(".grid-coordinate").forEach(element => {
     element.addEventListener("click", () => {
       let key = parseInt(element.getAttribute("key"));
@@ -128,7 +127,7 @@ const createEmptyGrid = (classList, componentClassName) => {
   let i = 0;
   while (i < 100) {
     const component = document.createElement("div");
-    component.setAttribute('key', i);
+    component.setAttribute("key", i);
     component.className = componentClassName;
     newGrid.appendChild(component);
     i++;
@@ -160,10 +159,10 @@ const createCoordinate = (key, playerBoard, shipsInput) => {
     if (dropTheShip(playerBoard, shipLength, shipCoordinate, alignment)) {
       addClassNameToTheShip("ship", key, alignment, shipLength);
       shipsInput.updateSelectedShip();
-      document.querySelector('.ships-input-prompt').setAttribute("name", `${shipsInput.getShipName()}`);
+      document.querySelector(".ships-input-prompt").setAttribute("name", `${shipsInput.getShipName()}`);
       if (shipsInput.isOutOfShips()) {
-        (0,_popup__WEBPACK_IMPORTED_MODULE_3__.hide)('shipdropping');
-        (0,_popup__WEBPACK_IMPORTED_MODULE_3__.show)('header-name');
+        (0,_popup__WEBPACK_IMPORTED_MODULE_3__.hide)("shipdropping");
+        (0,_popup__WEBPACK_IMPORTED_MODULE_3__.show)("header-name");
         (0,_popup__WEBPACK_IMPORTED_MODULE_3__.show)("game-start");
       }
     }
@@ -199,7 +198,7 @@ const getShipsCoordinates = (key, alignment, selectedShip) => {
   return arr;
 };
 const createGrid = (size, playerGameBoard, classList) => {
-  const shipsGridContainer = document.createElement('main');
+  const shipsGridContainer = document.createElement("main");
   shipsGridContainer.classList.add("ships-input-grid");
   if (classList) {
     classList.forEach(className => {
@@ -249,7 +248,6 @@ const selectShips = () => {
       ships[selectedShip]--;
       return selectedShip;
     }
-    ;
     return false;
   };
   const getShipName = () => {
@@ -315,7 +313,6 @@ const startTheGame = () => {
   targetObject.parentNode.replaceChild(clonedObject, targetObject);
   (0,_popup__WEBPACK_IMPORTED_MODULE_0__.show)("enemy-grid");
   let player1Grid = document.querySelector(".grids-container").firstElementChild;
-  console.log(player1Grid);
   player1Grid.classList.add("gameon");
   return player1Grid;
 };
@@ -486,16 +483,16 @@ const game = (p1, pl1Grid, p2, pl2Grid) => {
   };
   const playAgainBtn = document.querySelector("button.play-again");
   playAgainBtn.addEventListener("click", () => {
-    player1.board.clearBoard();
-    player2.board.clearBoard();
+    player1.restart();
+    player2.restart();
     const player1Grid = document.querySelector(".ships-input-grid.player-grid");
     const player2OldGrid = document.querySelector(".ships-input-grid.enemy-grid");
     const player2NewGrid = (0,_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_1__.createEmptyGrid)(["ships-input-grid", "enemy-grid", "hide"], "grid-coordinate");
     player2OldGrid.parentNode.replaceChild(player2NewGrid, player2OldGrid);
     const newplayerGrid = (0,_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_1__.createGrid)(100, player1.board, ["player-grid"]);
     player1Grid.parentNode.replaceChild(newplayerGrid, player1Grid);
-    let player1Gridx = document.querySelector('.ships-input-grid.player-grid');
-    let player2Gridx = document.querySelector('.ships-input-grid.enemy-grid');
+    let player1Gridx = document.querySelector(".ships-input-grid.player-grid");
+    let player2Gridx = document.querySelector(".ships-input-grid.enemy-grid");
     console.log(player2Gridx);
     console.log(player1Gridx);
     (0,_scripts_dom_popup__WEBPACK_IMPORTED_MODULE_0__.hide)("gameover");
@@ -543,7 +540,6 @@ const nearestPoints = () => {
     return count;
   };
   const getLastPoint = goodMovesCount => {
-    console.log(heap);
     if (goodMovesCount == 0 || guessedAlignment == null) return heap.splice(heap.length - 1, 1);
     for (let i = heap.length - 1; i > heap.length - goodMovesCount - 1; i--) {
       if (guessedAlignment == "h") {
@@ -565,19 +561,12 @@ const nearestPoints = () => {
     heap.splice(heap.length - len - 1, len);
   };
   const clearRedundant = (lastHitPoint, goodMovesCount) => {
-    console.log(heap, length);
-    console.log(lastPoint);
-    console.log(lastHitPoint);
     if (lastHitPoint.x == lastPoint.x) guessedAlignment = "h";else if (lastHitPoint.y == lastPoint.y) guessedAlignment = "v";else guessedAlignment = null;
     lastPoint = lastHitPoint;
-    console.log(guessedAlignment);
-    console.log(heap.length - goodMovesCount);
     for (let i = heap.length - 1; i > heap.length - goodMovesCount - 1; i--) {
       if (guessedAlignment == "h" && parseInt(heap[i] / 10) != lastHitPoint.x) {
-        console.log(`horizontal and removed:  ${heap[i]}`);
         heap[i] = -1;
       } else if (guessedAlignment == "v" && parseInt(heap[i] % 10) != lastHitPoint.y) {
-        console.log(`vertical and removed:  ${heap[i]}`);
         heap[i] = -1;
       }
     }
@@ -634,17 +623,17 @@ const ai = () => {
   let pointsArr = fillArray(100);
   let proto = Object.create((0,_player__WEBPACK_IMPORTED_MODULE_0__.player)("ai"));
   const ChooseRandomAttackPoint = () => {
-    let query = Math.floor(Math.random() * (pointsArr.length - 1));
+    let query = parseInt(Math.random() * pointsArr.length);
     let queryValue = pointsArr[query];
     let queryPoint = coordinateToPoint(queryValue);
     pointsArr = pointsArr.filter(value => {
       return value != queryValue;
     });
+    console.log(`random point: ${queryPoint.x}, ${queryPoint.y} queryValue: ${queryValue}`);
     return queryPoint;
   };
   const coordinateToPoint = coordinate => (0,_point__WEBPACK_IMPORTED_MODULE_1__.point)(parseInt(coordinate / 10), parseInt(coordinate % 10));
   const requestAnAttack = () => {
-    console.log(goodMovesCount);
     let randomPoint;
     if (possiblePoints.isEmpty()) {
       randomPoint = ChooseRandomAttackPoint();
@@ -652,7 +641,6 @@ const ai = () => {
       let randomCoordinate = possiblePoints.getLastPoint(goodMovesCount);
       if (randomCoordinate == null) {
         randomPoint = ChooseRandomAttackPoint();
-        console.log('no valid moves found');
         goodMovesCount = 0;
       } else {
         goodMovesCount--;
@@ -665,7 +653,6 @@ const ai = () => {
       lastResult = gameEnemy.enemyAttack(randomPoint);
     }
     if (lastResult) {
-      console.log('hit');
       possiblePoints.clearRedundant(randomPoint, goodMovesCount);
       goodMovesCount = possiblePoints.addAdjacentPoints(randomPoint.x * 10 + randomPoint.y, pointsArr);
       let queryValue = randomPoint.x * 10 + randomPoint.y;
@@ -681,6 +668,12 @@ const ai = () => {
     currentGame.continueGame();
     return lastResult;
   };
+  const restart = () => {
+    lastResult = null;
+    goodMovesCount = 0;
+    pointsArr = fillArray(100);
+    proto.board.clearBoard();
+  };
   const enemyAttack = attackPoint => {
     let result = proto.board.receiveAttack(attackPoint);
     return result;
@@ -693,7 +686,6 @@ const ai = () => {
     currentGame = game;
     grid = playerGrid;
     possiblePoints = (0,_nearestPoints__WEBPACK_IMPORTED_MODULE_3__.nearestPoints)();
-    console.log(possiblePoints);
   };
   const getLastAttackResult = () => lastResult;
   return Object.assign(proto, {
@@ -701,7 +693,8 @@ const ai = () => {
     requestAnAttack,
     enemyAttack,
     isLost,
-    setGame
+    setGame,
+    restart
   });
 };
 
@@ -731,6 +724,11 @@ const human = name => {
   const enemyAttack = attackPoint => {
     let result = proto.board.receiveAttack(attackPoint);
     return result;
+  };
+  const restart = () => {
+    turn = false;
+    lastResult = null;
+    proto.board.clearBoard();
   };
   const isLost = () => {
     return proto.board.isAllSank();
@@ -765,7 +763,8 @@ const human = name => {
     makeAnAttack,
     enemyAttack,
     isLost,
-    setGame
+    setGame,
+    restart
   });
 };
 
@@ -1891,21 +1890,16 @@ backgroundSong.addEventListener("ended", () => {
 });
 let player1 = (0,_scripts_player_human__WEBPACK_IMPORTED_MODULE_1__.human)(player1Name);
 let player2 = (0,_scripts_player_ai__WEBPACK_IMPORTED_MODULE_0__.ai)();
-const gridsContainer = document.querySelector('.grids-container');
-let player1tempGrid = (0,_scripts_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_4__.createGrid)(100, player1.board, ['player-grid']);
-console.log(player1tempGrid);
+const gridsContainer = document.querySelector(".grids-container");
+let player1tempGrid = (0,_scripts_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_4__.createGrid)(100, player1.board, ["player-grid"]);
 gridsContainer.appendChild(player1tempGrid);
-let player2Grid = (0,_scripts_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_4__.createEmptyGrid)(["ships-input-grid", "enemy-grid", "hide"], 'grid-coordinate');
+let player2Grid = (0,_scripts_dom_createPlayerGrid__WEBPACK_IMPORTED_MODULE_4__.createEmptyGrid)(["ships-input-grid", "enemy-grid", "hide"], "grid-coordinate");
 gridsContainer.appendChild(player2Grid);
-console.log(player1tempGrid.childNodes);
 let startBtn = document.querySelector("button.game-start");
 startBtn.addEventListener("click", () => {
   player2.dropRandomShips([0, 0, 1, 2, 1, 1]);
   let player1Grid = (0,_scripts_dom_startTheGame__WEBPACK_IMPORTED_MODULE_6__.startTheGame)();
-  let player1Gridx = document.querySelector('.ships-input-grid.player-grid');
-  let player2Gridx = document.querySelector('.ships-input-grid.enemy-grid');
-  console.log(player2Gridx);
-  console.log(player1Gridx);
+  let player2Gridx = document.querySelector(".ships-input-grid.enemy-grid");
   let newGame = (0,_scripts_game__WEBPACK_IMPORTED_MODULE_2__.game)(player1, player2Gridx, player2, player1Grid);
   newGame.startGame(newGame);
 });
@@ -1913,4 +1907,4 @@ startBtn.addEventListener("click", () => {
 
 /******/ })()
 ;
-//# sourceMappingURL=bundle.3f0b99aade238c0e7f6f.js.map
+//# sourceMappingURL=bundle.66a8221ab9522a909ca8.js.map
