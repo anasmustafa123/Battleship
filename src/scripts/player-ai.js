@@ -19,18 +19,18 @@ const ai = () => {
   let pointsArr = fillArray(100);
   let proto = Object.create(player("ai"));
   const ChooseRandomAttackPoint = () => {
-    let query = Math.floor(Math.random() * (pointsArr.length - 1));
+    let query = parseInt(Math.random() * (pointsArr.length));
     let queryValue = pointsArr[query];
     let queryPoint = coordinateToPoint(queryValue);
     pointsArr = pointsArr.filter((value) => {
       return value != queryValue;
     });
+    console.log(`random point: ${queryPoint.x}, ${queryPoint.y} queryValue: ${queryValue}`);
     return queryPoint;
   };
   const coordinateToPoint = (coordinate) =>
     point(parseInt(coordinate / 10), parseInt(coordinate % 10));
   const requestAnAttack = () => {
-    console.log(goodMovesCount)
     let randomPoint;
     if (possiblePoints.isEmpty()) {
       randomPoint = ChooseRandomAttackPoint();
@@ -38,7 +38,6 @@ const ai = () => {
       let randomCoordinate = possiblePoints.getLastPoint(goodMovesCount);
       if(randomCoordinate == null){
         randomPoint = ChooseRandomAttackPoint();
-        console.log('no valid moves found')
         goodMovesCount = 0;
       }else {
          goodMovesCount--; 
@@ -51,7 +50,6 @@ const ai = () => {
       lastResult = gameEnemy.enemyAttack(randomPoint);
     }
     if (lastResult) {
-      console.log('hit')
       possiblePoints.clearRedundant(randomPoint, goodMovesCount);
       goodMovesCount = possiblePoints.addAdjacentPoints(
         randomPoint.x * 10 + randomPoint.y,
@@ -70,7 +68,12 @@ const ai = () => {
     currentGame.continueGame();
     return lastResult;
   };
-
+  const restart = () => {
+    lastResult = null;
+    goodMovesCount = 0;
+    pointsArr = fillArray(100);
+    proto.board.clearBoard();
+  }
   const enemyAttack = (attackPoint) => {
     let result = proto.board.receiveAttack(attackPoint);
     return result;
@@ -83,7 +86,6 @@ const ai = () => {
     currentGame = game;
     grid = playerGrid;
     possiblePoints = nearestPoints();
-    console.log(possiblePoints);
   };
   const getLastAttackResult = () => lastResult;
 
@@ -93,6 +95,7 @@ const ai = () => {
     enemyAttack,
     isLost,
     setGame,
+    restart
   });
 };
 export { ai };

@@ -10,6 +10,11 @@ const human = (name) => {
     let result = proto.board.receiveAttack(attackPoint);
     return result;
   }; 
+  const restart = () => {
+    turn = false;
+    lastResult = null;
+    proto.board.clearBoard();
+  }
   const isLost = () => {
     return proto.board.isAllSank();
   };
@@ -44,6 +49,7 @@ const human = (name) => {
     enemyAttack,
     isLost,
     setGame,
+    restart
   });
 };
 export { human };

@@ -42,8 +42,8 @@ const game = (p1, pl1Grid, p2, pl2Grid) => {
   };
   const playAgainBtn = document.querySelector("button.play-again");
   playAgainBtn.addEventListener("click", () => {
-    player1.board.clearBoard();
-    player2.board.clearBoard();
+    player1.restart();
+    player2.restart();
     const player1Grid = document.querySelector(".ships-input-grid.player-grid");
     const player2OldGrid = document.querySelector(
       ".ships-input-grid.enemy-grid"
